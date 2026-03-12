@@ -1,0 +1,30 @@
+{% extends "layout.twig" %}
+
+{% block title %}Seznam studentů | {% endblock %}
+{% block content %}
+    <section>
+        {% if action == 'add' %}
+            {% include 'components/admin/students/add.twig' %}
+        {% elseif action == 'edit' %}
+            {% include 'components/admin/students/edit.twig' %}
+        {% elseif action == 'add-assignment' %}
+            {% include 'components/admin/students/addAssignment.twig' %}
+        {% elseif action == 'edit-assignment' %}
+            {% include 'components/admin/students/editAssignment.twig' %}
+        {% elseif action == 'show' %}
+            {% include 'components/admin/students/show.twig' %}
+        {% elseif action == 'show-logs' %}
+            {% include 'components/admin/students/showLogs.twig' %}
+        {% elseif action == 'upload-stag' %}
+            {% include 'components/admin/students/uploadStag.twig' %}
+        {% elseif action == 'add-to-exam' %}
+            {% include 'components/admin/students/addToExam.twig' %}
+        {% elseif action == 'upload-stag-exam' %}
+            {% include 'components/admin/students/uploadStagExam.twig' %}
+        {% elseif action == 'checks-config' %}
+            {% include 'components/admin/students/checksConfig.twig' %}
+        {% else %}
+            {% include 'components/admin/students/default.twig' %}
+        {% endif %}
+    </section>
+{% endblock %}

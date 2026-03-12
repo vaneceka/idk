@@ -1,0 +1,80 @@
+<h1>Zadání {{ assignment.name }}</h1>
+<div>
+    Datum zveřejnění: <b>{{ assignment.dateFrom|date("j. n. Y H:i") }}</b>
+</div>
+<div>
+    Mezní termín odevzdání: <b>{{ assignment.dateTo|date("j. n. Y H:i") }}</b>
+</div>
+<div class="row">
+    <div class="col-lg-8 order-1 order-md-0">
+        <div class="border p-1">
+            <pre style="white-space: pre-wrap">{{ assignmentText }}</pre>
+        </div>
+    </div>
+    <div class="col-lg-4 order-0 order-md-1">
+        <div class="table-responsive mt-2">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Název</th>
+                    <th>Typ</th>
+                    <th>Akce</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for file in files %}
+                    <tr>
+                        <td>{{ file.filename }}</td>
+                        <td>{{ file.filetype.getName() }}</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-primary" href="{{ createLink('assignments', { id: assignment.id, file: file.id }) }}">Stáhnout</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="border p-3">
+            <h2>Odevzdání</h2>
+            {% if attempts > 0 and details.state is constant('\\App\\Model\\Database\\Types\\AssignmentState::NEW') %}
+                <div class="fs-5 alert alert-info">
+                    Práce již byla odevzdána.
+                    <br>Počet pokusů: {{ attempts }}
+                </div>
+            {% endif %}
+            {% if details.state is constant('\\App\\Model\\Database\\Types\\AssignmentState::REJECTED') %}
+                <div class="fs-5 alert alert-danger">
+                    Práce byla zamítnuta.
+                </div>
+            {% elseif details.state is constant('\\App\\Model\\Database\\Types\\AssignmentState::ACCEPTED') %}
+                <div class="fs-5 alert alert-success">
+                    Práce byla přijata.
+                </div>
+            {% elseif assignment.dateTo > now %}
+                {% if details.state is constant('\\App\\Model\\Database\\Types\\AssignmentState::RETURNED') %}
+                    <div class="fs-5 alert alert-warning">
+                        Práce byla vrácena k přepracování.
+                    </div>
+                {% endif %}
+                <form method="post" action="{{ currentUrl }}" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="attachment">Vypracování</label>
+                        <input type="file" name="attachment" id="attachment" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="submit" name="submit_attachment_form" class="btn btn-success" value="Odevzdat">
+                    </div>
+                </form>
+            {% else %}
+                <p class="text-danger">
+                    Práci již nelze znovu odevzdat.
+                </p>
+            {% endif %}
+            {% if details.result %}
+                <div><b>Komentář vyučujícího</b></div>
+                {{ details.result|nl2br }}
+            {% endif %}
+        </div>
+    </div>
+</div>

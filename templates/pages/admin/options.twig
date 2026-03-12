@@ -1,0 +1,24 @@
+{% extends "layout.twig" %}
+
+{% block title %}Nastavení | {% endblock %}
+{% block content %}
+    <section>
+        <h1>Nastavení</h1>
+        <form method="post" action="{{ currentUrl }}">
+            <div class="mb-3">
+                <label for="year">Akademický rok (pouze první kalendářní rok)</label>
+                <input id="year" class="form-control" type="number" name="year" required value="{{ post.year ?: '' }}">
+            </div>
+            <div class="mb-3">
+                <label for="semester">Semestr</label>
+                <select id="semester" name="semester" class="form-select" required>
+                    <option value="0" {{ post.semester == '0' ? 'selected' }}>Zimní semestr</option>
+                    <option value="1" {{ post.semester == '1' ? 'selected' }}>Letní semestr</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <input type="submit" class="btn btn-outline-success" name="admin_edit_options_form" value="Uložit">
+            </div>
+        </form>
+    </section>
+{% endblock %}

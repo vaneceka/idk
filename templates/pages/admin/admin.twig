@@ -1,0 +1,18 @@
+{% extends "layout.twig" %}
+
+{% block title %}Administrace | {% endblock %}
+{% block content %}
+    <section>
+        {% if loggedUser is null %}
+            {% include 'components/admin/login.twig' %}
+        {% else %}
+            {% if subjects %}
+                {% include 'components/admin/yourSubjects.twig' %}
+            {% elseif events %}
+                {% include 'components/admin/yourEvents.twig' %}
+            {% else %}
+                <p>Nemáte přiděleny žádné předměty</p>
+            {% endif %}
+        {% endif %}
+    </section>
+{% endblock %}

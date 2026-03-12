@@ -1,0 +1,37 @@
+<h1>Nastavení vyučujících a administrátorů</h1>
+<a class="btn btn-outline-success" href="{{ createLink('admin/users', { action: 'add' }) }}">
+    Přidat
+</a>
+<div class="table-responsive mt-2">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Uživatelské jméno</th>
+            <th>Jméno</th>
+            <th>Příjmení</th>
+            <th>Role</th>
+            <th>Akce</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for admin in admins %}
+            <tr>
+                <td>{{ admin.id }}</td>
+                <td>{{ admin.username }}</td>
+                <td>{{ admin.name }}</td>
+                <td>{{ admin.surname }}</td>
+                <td>{{ admin.isAdmin ? 'Administrátor' : 'Vyučující' }}</td>
+                <td>
+                    {% if admin.id != 1 %}
+                        <a class="btn btn-sm btn-outline-success" href="{{ createLink('admin/users', { action: 'edit', id: admin.id }) }}">Upravit</a>
+                    {% endif %}
+                    {% if loggedUser.id != admin.id and admin.id != 1 %}
+                        <a class="btn btn-sm btn-outline-danger" onclick="return confirm('Opravdu chcete odebrat tohoto uživatele?')" href="{{ createLink('admin/users', { action: 'delete', id: admin.id }) }}">Odebrat</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,24 @@
+<?php
+
+/*
+ * Konfigurace databáze
+ */
+
+const DB_HOST = "mariadb";
+const DB_USER = "generator";
+const DB_PASSWORD = "generator";
+const DB_NAME = "generator";
+
+/*
+ * Konfigurace uložených souborů
+ */
+
+const DOCUMENT_FOLDER = ROOT_DIR . '/document';
+const TEMP_DIR = ROOT_DIR . '/temp';
+
+const BASE_PATH = "";
+
+/**
+ * Konfigurace debuggeru
+ */
+const DEBUGGER = false;

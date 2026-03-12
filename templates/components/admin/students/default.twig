@@ -1,0 +1,116 @@
+{% set dayNames = {
+    1: 'Po',
+    2: 'Út',
+    3: 'St',
+    4: 'Čt',
+    5: 'Pá',
+    6: 'So',
+    7: 'Ne'
+} %}
+
+<h1>{{ event.isExam ? 'Zkouškový termín' : 'Rozvrhová akce' }} {{ subject.shortcut }}, {{ event.isExam ? (event.examDate|date("j. n. Y")) : (dayNames[event.day] | default(event.day)) }} {{ event.timeFrom }} - {{ event.timeTo }}</h1>
+<h2>Zadání</h2>
+<a class="btn btn-outline-primary" href="{{ createLink('admin/students', { action: 'add-assignment', event: event.id }) }}">
+    Vytvořit zadání
+</a>
+<a class="btn btn-outline-primary" href="{{ createLink('admin/students', { action: 'checks-config', event: event.id }) }}">
+    Konfigurace kontrol
+</a>
+<div class="table-responsive mt-2">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Název</th>
+            <th>Zveřejnění</th>
+            <th>Odevzdání</th>
+            <th>Akce</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for assignment in assignments %}
+            <tr>
+                <td>{{ assignment.name }}</td>
+                <td>{{ assignment.dateFrom|date("j. n. Y H:i") }}</td>
+                <td>{{ assignment.dateTo|date("j. n. Y H:i") }}</td>
+                <td>
+                    <a class="btn btn-sm btn-outline-success" href="{{ createLink('admin/students', { action: 'edit-assignment', event: event.id, id: assignment.id }) }}">Upravit</a>
+                    <a class="btn btn-sm btn-outline-danger" onclick="return confirm('Opravdu chcete vygenerovat zadání všem přiřazeným studentům? Tato akce může chvíli trvat')" href="{{ createLink('admin/students', { action: 'generate-all', event: event.id, assignment: assignment.id }) }}">Vygenerovat přiřazeným studentům</a>
+                    <a class="btn btn-sm btn-outline-primary" href="{{ createLink('admin/students', { action: 'download-all', event: event.id, assignment: assignment.id }) }}">Stáhnout vše</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<hr>
+<h2>Seznam studentů</h2>
+{% if event.isExam %}
+    <a class="btn btn-outline-success" href="{{ createLink('admin/students', { action: 'add-to-exam', event: event.id }) }}">
+        Přiřadit studenty
+    </a>
+    <a class="btn btn-outline-success" href="{{ createLink('admin/students', { action: 'upload-stag-exam', event: event.id }) }}">
+        Přiřadit podle exportu ze systému IS/STAG
+    </a>
+{% else %}
+    <a class="btn btn-outline-success" href="{{ createLink('admin/students', { action: 'add', event: event.id }) }}">
+        Přidat
+    </a>
+    <a class="btn btn-outline-success" href="{{ createLink('admin/students', { action: 'upload-stag', event: event.id }) }}">
+        Nahrát ze systému IS/STAG
+    </a>
+    <a class="btn btn-outline-primary" href="{{ createLink('admin/students', { action: 'export-submitted-stag-csv', event: event.id }) }}">Export STAG</a>
+{% endif %}
+<div class="table-responsive mt-2">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Osobní číslo</th>
+            <th>Orion</th>
+            <th>Jméno</th>
+            {% for assignment in assignments %}
+                <th>{{ assignment.name }}</th>
+            {% endfor %}
+            <th>Akce</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for student in students %}
+            <tr>
+                <td>{{ student['student'].studentNumber }}</td>
+                <td>{{ student['student'].orion }}</td>
+                <td>{{ student['student'].surname|upper }} {{ student['student'].name }}</td>
+                {% for assignment in assignments %}
+                    <td>
+                        {% if student['assignments'][assignment.id] is defined %}
+                            {% if student['assignments'][assignment.id].attempts > 0 %}
+                                Odevzdáno (Pokusů: {{ student['assignments'][assignment.id].attempts }})
+                                {% if student['assignments'][assignment.id].state is not constant('\\App\\Model\\Database\\Types\\AssignmentState::NEW') %}
+                                    <span class="text-{{ student['assignments'][assignment.id].state.getColor() }}">{{ student['assignments'][assignment.id].state.getText() }}</span>
+                                {% endif %}
+                                <a class="btn btn-sm p-0 btn-outline-primary" href="{{ createLink('admin/students', { action: 'show', event: event.id, assignment: assignment.id, id: student['student'].id }) }}">Zobrazit</a>
+                            {% elseif student['assignments'][assignment.id].generated %}
+                                Zadání vygenerováno
+                                <a class="btn btn-sm p-0 btn-outline-primary" href="{{ createLink('admin/students', { action: 'show', event: event.id, assignment: assignment.id, id: student['student'].id }) }}">Zobrazit</a>
+                                <a class="btn btn-sm p-0 btn-outline-danger" onclick="return confirm('Opravdu chcete vygenerovat zadání znovu? Stávající zadání bude zneplatněno')" href="{{ createLink('admin/students', { action: 'generate', event: event.id, assignment: assignment.id, id: student['student'].id }) }}">Přegenerovat</a>
+                            {% else %}
+                                Přiřazen k zadání
+                                <a class="btn btn-sm p-0 btn-outline-primary" href="{{ createLink('admin/students', { action: 'generate', event: event.id, assignment: assignment.id, id: student['student'].id }) }}">Generovat</a>
+                                <a class="btn btn-sm p-0 btn-outline-danger" href="{{ createLink('admin/students', { action: 'deassign', event: event.id, assignment: assignment.id, id: student['student'].id }) }}">Odebrat</a>
+                            {% endif %}
+                        {% else %}
+                            Nezadáno
+                            <a class="btn btn-sm p-0 btn-outline-success"  href="{{ createLink('admin/students', { action: 'assign', event: event.id, assignment: assignment.id, id: student['student'].id }) }}">Přidat k zadání</a>
+                        {% endif %}
+                    </td>
+                {% endfor %}
+                <td>
+                    {% if event.id == student['student'].scheduledEventId %}
+                        <a class="btn btn-sm btn-outline-primary" href="{{ createLink('admin/students', { action: 'show-logs', event: event.id, id: student['student'].id }) }}">Aktivita studenta</a>
+                        <a class="btn btn-sm btn-outline-success" href="{{ createLink('admin/students', { action: 'edit', event: event.id, id: student['student'].id }) }}">Upravit</a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

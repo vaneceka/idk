@@ -1,0 +1,22 @@
+<h1>Přidání studenta</h1>
+<form method="post" action="{{ currentUrl }}">
+    <div class="mb-3">
+        <label for="studentNumber">Osobní číslo</label>
+        <input id="studentNumber" class="form-control" type="text" name="studentNumber" required value="{{ post.studentNumber ?: '' }}" maxlength="15">
+    </div>
+    <div class="mb-3">
+        <label for="orion">Orion login</label>
+        <input id="orion" class="form-control" type="text" name="orion" required value="{{ post.orion ?: '' }}" maxlength="15">
+    </div>
+    <div class="mb-3">
+        <label for="name">Jméno</label>
+        <input id="name" class="form-control" type="text" name="name" required value="{{ post.name ?: '' }}" maxlength="255">
+    </div>
+    <div class="mb-3">
+        <label for="surname">Příjmení</label>
+        <input id="surname" class="form-control" type="text" name="surname" required value="{{ post.surname ?: '' }}" maxlength="255">
+    </div>
+    <div class="mb-3">
+        <input type="submit" class="btn btn-outline-success" name="admin_students_add_form" value="Přidat">
+    </div>
+</form>

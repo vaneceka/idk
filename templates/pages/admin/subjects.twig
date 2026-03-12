@@ -1,0 +1,22 @@
+{% extends "layout.twig" %}
+
+{% block title %}Administrace předmětů | {% endblock %}
+{% block content %}
+    <section>
+        {% if action == 'error' %}
+            <p>Není nastaven aktuální akademický rok!</p>
+        {% elseif action == 'add' %}
+            {% include 'components/admin/subjects/addForm.twig' %}
+        {% elseif action == 'edit' %}
+            {% include 'components/admin/subjects/editForm.twig' %}
+        {% elseif action == 'events' %}
+            {% include 'components/admin/subjects/events.twig' %}
+        {% elseif action == 'add-event' %}
+            {% include 'components/admin/subjects/addEventForm.twig' %}
+        {% elseif action == 'edit-event' %}
+            {% include 'components/admin/subjects/editEventForm.twig' %}
+        {% else %}
+            {% include 'components/admin/subjects/default.twig' %}
+        {% endif %}
+    </section>
+{% endblock %}

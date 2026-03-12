@@ -1,0 +1,47 @@
+<h1>Záznam aktivit studenta {{ student.surname|upper }} {{ student.name }}</h1>
+<div class="table-responsive mt-2">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Čas</th>
+            <th>Typ</th>
+            <th>Zpráva</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for log in logs %}
+            <tr>
+                <td>{{ log.time|date("j. n. Y H:i:s") }}</td>
+                <td>{{ log.logType.getName() }}</td>
+                <td>{{ log.message }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% set totalPages = (logCount / limit)|round(0, 'ceil') %}
+
+{% if totalPages != 0 %}
+    <nav>
+        <ul class="pagination">
+            <li class="page-item {{ page == 1 ? 'disabled' }}">
+                <a class="page-link" href="{{ createLink('admin/students', { action: 'show-logs', id: student.id, event: event.id, pageNum: page - 1 }) }}" aria-label="Předchozí">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+
+            {% for i in 1..totalPages %}
+                <li class="page-item {{ page == i ? 'active' }}">
+                    <a class="page-link" href="{{ createLink('admin/students', { action: 'show-logs', id: student.id, event: event.id, pageNum: i }) }}">{{ i }}</a>
+                </li>
+            {% endfor %}
+
+            <li class="page-item {{ page == totalPages ? 'disabled' }}">
+                <a class="page-link" href="{{ createLink('admin/students', { action: 'show-logs', id: student.id, event: event.id, pageNum: page + 1 }) }}" aria-label="Další">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+{% endif %}

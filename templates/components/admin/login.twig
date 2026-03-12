@@ -1,0 +1,14 @@
+<h1>Přihlášení do administrace</h1>
+<form method="post" action="{{ currentUrl }}">
+    <div class="mb-3">
+        <label for="username">Uživatelské jméno</label>
+        <input id="username" class="form-control" type="text" name="username" required>
+    </div>
+    <div class="mb-3">
+        <label for="password">Heslo</label>
+        <input id="password" class="form-control" type="password" name="password" required>
+    </div>
+    <div class="mb-3">
+        <input type="submit" class="btn btn-outline-success" name="admin_login_form" value="Přihlásit se">
+    </div>
+</form>

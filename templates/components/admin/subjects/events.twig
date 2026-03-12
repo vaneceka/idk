@@ -1,0 +1,48 @@
+
+<h1>Nastavení rozvrhových akcí předmětu {{ subject.shortcut }}</h1>
+<a class="btn btn-outline-success" href="{{ createLink('admin/subjects', { action: 'add-event', id: subject.id }) }}">
+    Přidat
+</a>
+<div class="table-responsive mt-2">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Den</th>
+            <th>Typ</th>
+            <th>Čas od</th>
+            <th>Čas do</th>
+            <th>Akce</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% set dayNames = {
+            1: 'Pondělí',
+            2: 'Úterý',
+            3: 'Středa',
+            4: 'Čtvrtek',
+            5: 'Pátek',
+            6: 'Sobota',
+            7: 'Neděle'
+        } %}
+
+        {% for event in events %}
+            <tr>
+                <td>
+                    {% if event.isExam %}
+                        {{ event.examDate|date("j. n. Y") }}
+                    {% else %}
+                        {{ dayNames[event.day] | default(event.day) }}
+                    {% endif %}
+                </td>
+                <td>{{ event.isExam ? 'Zkouškový termín' : 'Pravidelná akce' }}</td>
+                <td>{{ event.timeFrom }}</td>
+                <td>{{ event.timeTo }}</td>
+                <td>
+                    <a class="btn btn-sm btn-outline-success" href="{{ createLink('admin/subjects', { action: 'edit-event', id: event.id }) }}">Upravit</a>
+                    {#                                    <a class="btn btn-sm btn-outline-danger" onclick="return confirm('Opravdu chcete odebrat tento předmět?')" href="{{ createLink('admin/subjects', { action: 'delete', id: subject.id }) }}">Odebrat</a>#}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

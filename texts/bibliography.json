@@ -1,0 +1,115 @@
+[
+  {
+    "type": "book",
+    "data": {
+      "author": "Novák, Petr",
+      "title": "Moderní metody prevence ve zdravotnictví",
+      "year": "2023",
+      "publisher": "Nakladatelství Zdraví",
+      "address": "Praha",
+      "isbn": "978-1-234-56789-0"
+    }
+  },
+  {
+    "type": "article",
+    "data": {
+      "author": "Králová, Martina and Dvořák, Jiří",
+      "title": "Dopady digitalizace na poskytování zdravotní péče",
+      "journal": "Český lékařský časopis",
+      "year": "2022",
+      "volume": "29",
+      "number": "3",
+      "pages": "45--58",
+      "issn": "1234-5678"
+    }
+  },
+  {
+    "type": "online",
+    "data": {
+      "author": "Svoboda, Tomáš",
+      "title": "Telemedicína a její role v budoucnosti zdravotní péče",
+      "year": "2021",
+      "url": "https://www.medicalfuture.cz/telemedicina",
+      "note": "[cit. 2023-10-10]"
+    }
+  },
+  {
+    "type": "book",
+    "data": {
+      "author": "Kováč, Milan",
+      "title": "Etika a právo v moderní medicíně",
+      "year": "2020",
+      "publisher": "EtikaPress",
+      "address": "Brno",
+      "isbn": "979-1-2345-6789-3"
+    }
+  },
+  {
+    "type": "article",
+    "data": {
+      "author": "Horák, Jan and Malá, Petra",
+      "title": "Nové přístupy ve fyzioterapii starších pacientů",
+      "journal": "Journal of Physical Rehabilitation",
+      "year": "2022",
+      "volume": "11",
+      "number": "4",
+      "pages": "22--36",
+      "issn": "9876-5432"
+    }
+  },
+  {
+    "type": "online",
+    "data": {
+      "author": "Růžička, Daniel",
+      "title": "Bezpečnost a ochrana dat v nemocnicích: Výzvy digitálního věku",
+      "year": "2023",
+      "url": "https://www.zdravotnabezpecnost.cz/ochranadat",
+      "note": "[cit. 2023-07-05]"
+    }
+  },
+  {
+    "type": "book",
+    "data": {
+      "author": "Šimková, Alena",
+      "title": "Farmakologie v klinické praxi: Teorie a aplikace",
+      "year": "2019",
+      "publisher": "Medika Books",
+      "address": "Ostrava",
+      "isbn": "979-4-5678-1234-7"
+    }
+  },
+  {
+    "type": "article",
+    "data": {
+      "author": "Jelínek, Václav",
+      "title": "Robotická chirurgie a její přínos pro pacienty",
+      "journal": "Technologie ve zdravotnictví",
+      "year": "2021",
+      "volume": "15",
+      "number": "2",
+      "pages": "10--19",
+      "issn": "4567-1234"
+    }
+  },
+  {
+    "type": "online",
+    "data": {
+      "author": "Havelka, Ondřej",
+      "title": "Epidemiologické výzvy 21. století",
+      "year": "2020",
+      "url": "https://www.epidemiologieonline.cz/vyzvy21stoleti",
+      "note": "[cit. 2021-02-15]"
+    }
+  },
+  {
+    "type": "book",
+    "data": {
+      "author": "Veselá, Kateřina",
+      "title": "Psychosociální podpora pacientů: Praktické přístupy",
+      "year": "2022",
+      "publisher": "Psychologie v praxi",
+      "address": "Brno",
+      "isbn": "978-3-4567-8901-1"
+    }
+  }
+]

@@ -1,0 +1,48 @@
+<h1>Úprava zadání</h1>
+<form method="post" action="{{ currentUrl }}">
+    <div class="mb-3">
+        <label for="profile">Profil zadání</label>
+        <select id="profile" name="profile" class="form-select" required>
+            {% for profile in profiles %}
+                <option value="{{ profile.id }}" {{ post.profile == profile.id ? 'selected' }}>{{ profile.name }} ({{ profile.type.getName() }})</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="name">Název</label>
+        <input id="name" class="form-control" type="text" name="name" required value="{{ post.name ?: '' }}" maxlength="255">
+    </div>
+    <div class="mb-3">
+        <label for="dateFrom">Datum zveřejnění</label>
+        <input id="dateFrom" class="form-control" type="datetime-local" name="dateFrom" required value="{{ post.dateFrom ?: '' }}">
+    </div>
+    <div class="mb-3">
+        <label for="dateTo">Datum odevzdání</label>
+        <input id="dateTo" class="form-control" type="datetime-local" name="dateTo" required value="{{ post.dateTo ?: '' }}">
+    </div>
+    {% if students %}
+        <div class="mb-3">
+            <fieldset>
+                <legend>Studenti</legend>
+                <label class="pb-1 mb-2 border-bottom">
+                    <input type="checkbox" id="all-students">
+                    Všichni studenti
+                </label>
+                {% for student in students %}
+                    <div>
+                        <label>
+                            <input type="checkbox" name="students[]" value="{{ student.id }}" {{ post.students is not defined or student.id in post.students ? 'checked' }}>
+                            {{ student.surname|upper }} {{ student.name }} - {{ student.studentNumber }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </fieldset>
+        </div>
+        <script>
+            initCheckboxToggling('students[]', 'all-students');
+        </script>
+    {% endif %}
+    <div class="mb-3">
+        <input type="submit" class="btn btn-outline-success" name="admin_students_assignment_edit_form" value="Upravit">
+    </div>
+</form>

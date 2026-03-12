@@ -1,0 +1,14 @@
+{% extends "layout.twig" %}
+
+{% block title %}Administrace vyučujících | {% endblock %}
+{% block content %}
+    <section>
+        {% if action == 'add' %}
+            {% include 'components/admin/users/addForm.twig' %}
+        {% elseif action == 'edit' %}
+            {% include 'components/admin/users/editForm.twig' %}
+        {% else %}
+            {% include 'components/admin/users/default.twig' %}
+        {% endif %}
+    </section>
+{% endblock %}

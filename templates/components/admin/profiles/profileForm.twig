@@ -1,0 +1,20 @@
+<div class="mb-3">
+    <label for="name">Název</label>
+    <input id="name" class="form-control" type="text" name="name" required value="{{ post.name ?: '' }}">
+</div>
+<div class="mb-3">
+    <label for="type">Typ</label>
+    <select id="type" name="type" class="form-select" required>
+        <option value="document" {{ post.type == 'document' ? 'selected' }}>Dokument</option>
+        <option value="table_processor" {{ post.type == 'table_processor' ? 'selected' }}>Tabulkový procesor</option>
+    </select>
+</div>
+<div id="document" style="display: {{ not post.type or post.type == 'document' ? 'block' : 'none' }}">
+    {% include 'components/admin/profiles/docProfileSettings.twig' %}
+</div>
+<div id="table_processor" style="display: {{ post.type == 'table_processor' ? 'block' : 'none' }}">
+    {% include 'components/admin/profiles/tableProfileSettings.twig' %}
+</div>
+<script>
+    initToggleSwitching('type', 'document', 'table_processor');
+</script>

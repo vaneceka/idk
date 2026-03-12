@@ -1,0 +1,195 @@
+{
+  "Příjem pacienta": [
+    "Vyplnění základních údajů",
+    "Zdravotní prohlídka a anamnéza"
+  ],
+  "Diagnostické testy": [
+    "Krevní testy",
+    "Rentgen nebo CT vyšetření"
+  ],
+  "Stanovení léčebného plánu": [
+    "Konzultace s odborníky",
+    "Předepsání medikace"
+  ],
+  "Monitorování průběhu léčby": [
+    "Pravidelná kontrola vitálních funkcí",
+    "Úprava léčebného plánu podle výsledků"
+  ],
+  "Propouštění a následná péče": [
+    "Instrukce pro domácí péči",
+    "Doporučení další léčby nebo rehabilitace"
+  ],
+  "Genetika a genomika": [
+    "Identifikace genetických mutací",
+    "Vliv genetiky na léčebné výsledky"
+  ],
+  "Farmakologie": [
+    "Testování nových léků",
+    "Studium farmakokinetiky a farmakodynamiky"
+  ],
+  "Epidemiologie": [
+    "Výzkum přenosu infekcí",
+    "Analýza rizikových faktorů nemocí"
+  ],
+  "Chirurgické inovace": [
+    "Laparoskopické a robotické techniky",
+    "Nové metody hojení ran"
+  ],
+  "Prevence a veřejné zdraví": [
+    "Očkovací programy",
+    "Edukace o zdravém životním stylu"
+  ],
+  "Výběr vhodné vakcíny": [
+    "Analýza rizik a přínosů",
+    "Konzultace s odbornými komisemi"
+  ],
+  "Logistika distribuce vakcín": [
+    "Plánování dopravy a skladování",
+    "Zajištění chladícího řetězce"
+  ],
+  "Registrace a sledování očkovaných osob": [
+    "Elektronické databáze pacientů",
+    "Sledování nežádoucích účinků"
+  ],
+  "Edukace veřejnosti o očkování": [
+    "Informační kampaně a materiály",
+    "Komunikace s odbornou veřejností"
+  ],
+  "Monitorování účinnosti očkování": [
+    "Pravidelné vyhodnocování dat",
+    "Studie o dlouhodobé účinnosti"
+  ],
+  "Fyzioterapie a rehabilitace": [
+    "Cvičení pro udržení mobility",
+    "Terapie zaměřené na rovnováhu"
+  ],
+  "Kognitivní podpora": [
+    "Aktivity na podporu paměti",
+    "Terapie pro prevenci demence"
+  ],
+  "Nutriční péče": [
+    "Sledování příjmu potravy",
+    "Doporučení specifické diety"
+  ],
+  "Psychosociální podpora": [
+    "Programy pro podporu duševního zdraví",
+    "Skupinová terapie a společenské aktivity"
+  ],
+  "Zdravotní dohled a monitorování": [
+    "Pravidelné lékařské prohlídky",
+    "Monitorování vitálních funkcí"
+  ],
+  "Zubní prohlídky": [
+    "Prevence kazů a paradentózy",
+    "Kontrola stavu dásní a skloviny"
+  ],
+  "Kardiologická vyšetření": [
+    "Měření krevního tlaku",
+    "Elektrokardiografie (EKG)",
+    "Echokardiografie",
+    "Zátěžový test"
+  ],
+  "Onkologická screeningová vyšetření": [
+    "Mamografie pro ženy",
+    "Kolonoskopie pro muže a ženy",
+    "PAP test pro ženy",
+    "Dermatoskopie pro detekci melanomu"
+  ],
+  "Endokrinologická vyšetření": [
+    "Testy na hladinu glukózy",
+    "Kontrola štítné žlázy",
+    "Hormonální testy",
+    "Testy na hladinu vápníku"
+  ],
+  "Oftalmologická vyšetření": [
+    "Testy zraku",
+    "Kontrola nitroočního tlaku",
+    "Oční fundus",
+    "Perimetrie"
+  ],
+  "Gastroenterologická vyšetření": [
+    "Gastroskopie",
+    "Kolonoskopie",
+    "FibroScan pro jaterní testy",
+    "Ultrazvuk břicha"
+  ],
+  "Neurologická vyšetření": [
+    "CT/MRI mozku",
+    "Elektroencefalografie (EEG)",
+    "Neurologické testy reflexů",
+    "Lumbální punkce"
+  ],
+  "Dermatologická vyšetření": [
+    "Kůže vyšetření na znaménka",
+    "Dermatoskopie",
+    "Vyšetření pro rakovinu kůže",
+    "Vyšetření pigmentových změn"
+  ],
+  "Urologická vyšetření": [
+    "Ultrazvuk ledvin a močového měchýře",
+    "Prostatický specifický antigen (PSA) test",
+    "Cystoskopie",
+    "Uroflowmetrie"
+  ],
+  "Psychiatrická vyšetření": [
+    "Hodnocení duševního zdraví",
+    "Testy na kognitivní funkce",
+    "Vyšetření deprese",
+    "Psychologické testy"
+  ],
+  "Pediatrická vyšetření": [
+    "Měření výšky a hmotnosti",
+    "Testy na sluch a zrak",
+    "Imunizační program"
+  ],
+  "Rehabilitační vyšetření": [
+    "Fyzikální terapie",
+    "Testy pohybových schopností",
+    "Ultrazvuková terapie"
+  ],
+  "Chirurgická vyšetření": [
+    "Ultrazvukové vyšetření břicha",
+    "Vyšetření pohybového aparátu",
+    "Preoperační testy"
+  ],
+  "Geriatrická vyšetření": [
+    "Vyšetření pro kognitivní poruchy",
+    "Testy na osteoporózu",
+    "Kardiovaskulární vyšetření pro seniory"
+  ],
+  "Reprodukční vyšetření": [
+    "Ultrazvuková vyšetření v těhotenství",
+    "Spermiogram pro muže",
+    "Testy na plodnost u žen"
+  ],
+  "Zdravotní služby": [
+    "Domácí péče",
+    "Hospitalizace",
+    "Rehabilitace po operacích"
+  ],
+  "Zdravotní technologie": [
+    "Telemedicína",
+    "Nositelné zdravotní zařízení",
+    "Umělá inteligence v diagnostice"
+  ],
+  "Lékařské oblasti": [
+    "Kardiologie",
+    "Neurologie",
+    "Pediatrie"
+  ],
+  "Léčebné metody": [
+    "Fyzikální terapie",
+    "Chirurgické zákroky",
+    "Psychoterapie"
+  ],
+  "Zdravotní preventivní opatření": [
+    "Očkování",
+    "Zdravý životní styl",
+    "Pravidelné prohlídky"
+  ],
+  "Lékařské obory specializace": [
+    "Onkologie",
+    "Endokrinologie",
+    "Gastroenterologie"
+  ]
+}

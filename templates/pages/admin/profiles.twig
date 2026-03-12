@@ -1,0 +1,14 @@
+{% extends "layout.twig" %}
+
+{% block title %}Administrace profilů zadání | {% endblock %}
+{% block content %}
+    <section>
+        {% if action == 'add' %}
+            {% include 'components/admin/profiles/addForm.twig' %}
+        {% elseif action == 'edit' %}
+            {% include 'components/admin/profiles/editForm.twig' %}
+        {% else %}
+            {% include 'components/admin/profiles/default.twig' %}
+        {% endif %}
+    </section>
+{% endblock %}

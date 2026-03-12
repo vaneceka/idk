@@ -1,0 +1,80 @@
+{% extends "layout.twig" %}
+
+{% block title %}Záznam aktivit | {% endblock %}
+{% block content %}
+    <section>
+        <h1>Záznam aktivit</h1>
+        <form method="get" action="{{ currentUrl }}">
+            <div class="row align-items-end">
+                <div class="col-md">
+                    <label for="searchUser">Uživatel</label>
+                    <input type="text" name="searchUser" id="searchUser" value="{{ searchUser }}" class="form-control">
+                </div>
+                <div class="col-md">
+                    <label for="search">Zpráva</label>
+                    <input type="text" name="search" id="search" value="{{ search }}" class="form-control">
+                </div>
+                <div class="col-md">
+                    <label for="searchType">Typ</label>
+                    <select name="searchType" id="searchType" class="form-select">
+                        <option value="">Vše</option>
+                        {% for type in logTypes %}
+                            <option value="{{ type.value }}" {{ searchType is same as(type) ? 'selected' }}>{{ type.getName() }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <input type="submit" value="Hledat" class="btn btn-outline-primary">
+                </div>
+            </div>
+        </form>
+        <div class="table-responsive mt-2">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Čas</th>
+                        <th>Uživatel</th>
+                        <th>Typ</th>
+                        <th>Zpráva</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                        <tr>
+                            <td>{{ log.time|date("j. n. Y H:i:s") }}</td>
+                            <td>{{ log.userName }} {{ log.studentId ? ' (student)' }}</td>
+                            <td>{{ log.logType.getName() }}</td>
+                            <td>{{ log.message }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% set totalPages = (logCount / limit)|round(0, 'ceil') %}
+
+        {% if totalPages != 0 %}
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item {{ page == 1 ? 'disabled' }}">
+                        <a class="page-link" href="{{ createLink('admin/log', { pageNum: page - 1 }) }}" aria-label="Předchozí">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    {% for i in 1..totalPages %}
+                        <li class="page-item {{ page == i ? 'active' }}">
+                            <a class="page-link" href="{{ createLink('admin/log', { pageNum: i }) }}">{{ i }}</a>
+                        </li>
+                    {% endfor %}
+
+                    <li class="page-item {{ page == totalPages ? 'disabled' }}">
+                        <a class="page-link" href="{{ createLink('admin/log', { pageNum: page + 1 }) }}" aria-label="Další">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
+    </section>
+{% endblock %}

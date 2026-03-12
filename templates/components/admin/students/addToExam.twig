@@ -1,0 +1,41 @@
+
+{% set dayNames = {
+    1: 'Po',
+    2: 'Út',
+    3: 'St',
+    4: 'Čt',
+    5: 'Pá',
+    6: 'So',
+    7: 'Ne'
+} %}
+
+<h1>Přiřazení studentů z rozvrhových akcí</h1>
+<form method="post" action="{{ currentUrl }}">
+    <div class="mb-3">
+        <fieldset>
+            <legend>Studenti</legend>
+            <div class="mb-3">
+                {% for subjectEvent in allEvents %}
+                    <label class="pb-1 mb-2 border-bottom">
+                        <input type="checkbox" id="all-students-{{ subjectEvent.id }}">
+                        Všichni studenti z rozvrhové akce {{ dayNames[event.day] | default(event.day) }} {{ event.timeFrom }} - {{ event.timeTo }}
+                    </label>
+                {% for student in allStudents[subjectEvent.id] %}
+                    <div>
+                        <label>
+                            <input type="checkbox" name="students[{{ subjectEvent.id }}][]" value="{{ student.id }}" {{ student.id in assignedStudents ? 'checked' }}>
+                            {{ student.surname|upper }} {{ student.name }} - {{ student.studentNumber }}
+                        </label>
+                    </div>
+                {% endfor %}
+                    <script>
+                        initCheckboxToggling('students[{{ subjectEvent.id }}][]', 'all-students-{{ subjectEvent.id }}');
+                    </script>
+                {% endfor %}
+            </div>
+        </fieldset>
+        <div class="mb-3">
+            <input type="submit" class="btn btn-outline-success" name="admin_students_add_to_exam_form" value="Přiřadit">
+        </div>
+    </div>
+</form>

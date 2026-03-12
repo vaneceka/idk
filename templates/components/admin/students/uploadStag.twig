@@ -1,0 +1,10 @@
+<h1>Nahrání studentů ze systému IS/STAG</h1>
+<form method="post" action="{{ currentUrl }}" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="file">Soubor se studenty (.csv)</label>
+        <input id="file" class="form-control" type="file" name="file" required accept=".csv">
+    </div>
+    <div class="mb-3">
+        <input type="submit" class="btn btn-outline-success" name="admin_students_upload_from_stag" value="Nahrát">
+    </div>
+</form>

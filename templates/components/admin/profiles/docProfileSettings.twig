@@ -1,0 +1,91 @@
+
+<div class="mb-3">
+    Počet odstavců úvodu
+    <div>
+        <label>Od <input type="number" name="doc[intro_paragraphs_from]" value="{{ post.doc['intro_paragraphs_from'] ?: '1' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+        <label>do <input type="number" name="doc[intro_paragraphs_to]" value="{{ post.doc['intro_paragraphs_to'] ?: '2' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+    </div>
+</div>
+<div class="mb-3">
+    Počet kapitol 1. úrovně
+    <div>
+        <label>Od <input type="number" name="doc[section_1_from]" value="{{ post.doc['section_1_from'] ?: '2' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+        <label>do <input type="number" name="doc[section_1_to]" value="{{ post.doc['section_1_to'] ?: '3' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+    </div>
+</div>
+<div class="mb-3">
+    Počet odstavců v kapitolách 1. úrovně
+    <div>
+        <label>Od <input type="number" name="doc[section_1_paragraphs_from]" value="{{ post.doc['section_1_paragraphs_from'] ?: '1' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+        <label>do <input type="number" name="doc[section_1_paragraphs_to]" value="{{ post.doc['section_1_paragraphs_to'] ?: '1' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+    </div>
+</div>
+<div class="mb-3">
+    Počet kapitol 2. úrovně v kapitole 1. úrovně
+    <div>
+        <label>Od <input type="number" name="doc[section_2_from]" value="{{ post.doc['section_2_from'] ?: '2' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+        <label>do <input type="number" name="doc[section_2_to]" value="{{ post.doc['section_2_to'] ?: '3' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+    </div>
+</div>
+<div class="mb-3">
+    Počet odstavců v kapitolách 2. úrovně (bez kapitol 3. úrovně)
+    <div>
+        <label>Od <input type="number" name="doc[section_2_paragraphs_from]" value="{{ post.doc['section_2_paragraphs_from'] ?: '2' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+        <label>do <input type="number" name="doc[section_2_paragraphs_to]" value="{{ post.doc['section_2_paragraphs_to'] ?: '3' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+    </div>
+</div>
+<div class="mb-3">
+    Počet kapitol 3. úrovně v kapitolách 2. úrovně
+    <div>
+        <label>Od <input type="number" name="doc[section_3_from]" value="{{ post.doc['section_3_from'] ?: '2' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+        <label>do <input type="number" name="doc[section_3_to]" value="{{ post.doc['section_3_to'] ?: '4' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+    </div>
+</div>
+<div class="mb-3">
+    Počet odstavců v kapitolách 3. úrovně
+    <div>
+        <label>Od <input type="number" name="doc[section_3_paragraphs_from]" value="{{ post.doc['section_3_paragraphs_from'] ?: '2' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+        <label>do <input type="number" name="doc[section_3_paragraphs_to]" value="{{ post.doc['section_3_paragraphs_to'] ?: '3' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+    </div>
+</div>
+<div class="mb-3">
+    Počet odstavců závěru
+    <div>
+        <label>Od <input type="number" name="doc[conclusion_paragraphs_from]" value="{{ post.doc['conclusion_paragraphs_from'] ?: '1' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+        <label>do <input type="number" name="doc[conclusion_paragraphs_to]" value="{{ post.doc['conclusion_paragraphs_to'] ?: '2' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+    </div>
+</div>
+<div class="mb-3">
+    Počet bibliografických zdrojů
+    <div>
+        <label>Od <input type="number" name="doc[bibliography_from]" value="{{ post.doc['bibliography_from'] ?: '3' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+        <label>do <input type="number" name="doc[bibliography_to]" value="{{ post.doc['bibliography_to'] ?: '3' }}" step="1" min="0" class="form-control d-inline w-auto"></label>
+    </div>
+</div>
+<div class="mb-3">
+    <p><b>Zdrojové soubory</b> (nahrajte pouze při změně)</p>
+    <div class="mb-3">
+        <label for="doc_file_sentences">Seznam vět (.txt)</label>
+        <input type="file" name="doc_file[sentences]" id="doc_file_sentences" accept=".txt">
+    </div>
+    <div class="mb-3">
+        <label for="doc_file_titles">Seznam titulků (.txt)</label>
+        <input type="file" name="doc_file[title]" id="doc_file_titles" accept=".txt">
+    </div>
+    <div class="mb-3">
+        <label for="doc_file_captions">Seznam popisků obrázků (.txt)</label>
+        <input type="file" name="doc_file[captions]" id="doc_file_captions" accept=".txt">
+    </div>
+    <div class="mb-3">
+        <label for="doc_file_topics">Seznam témat (.txt)</label>
+        <input type="file" name="doc_file[topics]" id="doc_file_topics" accept=".txt">
+    </div>
+    <div class="mb-3">
+        <label for="doc_file_list">Položky pro seznamy (.json)</label>
+        <input type="file" name="doc_file[list]" id="doc_file_list" accept=".json">
+    </div>
+    <div class="mb-3">
+        <label for="doc_file_bibliography">Bibliografické záznamy (.json)</label>
+        <input type="file" name="doc_file[bibliography]" id="doc_file_bibliography" accept=".json">
+    </div>
+</div>

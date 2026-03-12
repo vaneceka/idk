@@ -1,0 +1,29 @@
+<h1>Nastavení profilů zadání</h1>
+<a class="btn btn-outline-success" href="{{ createLink('admin/profiles', { action: 'add' }) }}">
+    Přidat
+</a>
+<div class="table-responsive mt-2">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Název</th>
+            <th>Typ</th>
+            <th>Akce</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for profile in profiles %}
+            <tr>
+                <td>{{ profile.id }}</td>
+                <td>{{ profile.name }}</td>
+                <td>{{ profile.type.getName() }}</td>
+                <td>
+                    <a class="btn btn-sm btn-outline-success" href="{{ createLink('admin/profiles', { action: 'edit', id: profile.id }) }}">Upravit</a>
+                    <a class="btn btn-sm btn-outline-danger" onclick="return confirm('Opravdu chcete odebrat tento profil?')" href="{{ createLink('admin/profiles', { action: 'delete', id: profile.id }) }}">Odebrat</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

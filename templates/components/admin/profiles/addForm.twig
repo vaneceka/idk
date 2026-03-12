@@ -1,0 +1,7 @@
+<h1>Přidání profilu zadání</h1>
+<form method="post" action="{{ currentUrl }}" enctype="multipart/form-data">
+    {% include 'components/admin/profiles/profileForm.twig' %}
+    <div class="mb-3">
+        <input type="submit" class="btn btn-outline-success" name="admin_profiles_add_form" value="Přidat">
+    </div>
+</form>

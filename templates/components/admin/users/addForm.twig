@@ -1,0 +1,22 @@
+<h1>Přidání uživatele</h1>
+<form method="post" action="{{ currentUrl }}">
+    {% include 'components/admin/users/userForm.twig' %}
+    <div class="mb-3">
+        <label for="password">Heslo</label>
+        <input id="password" class="form-control" type="password" name="password" required>
+    </div>
+    <div class="mb-3">
+        <label for="passwordAgain">Heslo znovu</label>
+        <input id="passwordAgain" class="form-control" type="password" name="passwordAgain" required>
+    </div>
+    <div class="mb-3">
+        <label for="role">Role</label>
+        <select id="role" name="role" class="form-select" required>
+            <option value="0" {{ post.role == '0' ? 'selected' }}>Vyučující</option>
+            <option value="1" {{ post.role == '1' ? 'selected' }}>Administrátor</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <input type="submit" class="btn btn-outline-success" name="admin_users_add_form" value="Přidat">
+    </div>
+</form>

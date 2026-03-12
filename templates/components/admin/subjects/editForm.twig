@@ -1,0 +1,14 @@
+<h1>Úprava předmětu</h1>
+<form method="post" action="{{ currentUrl }}">
+    <div class="mb-3">
+        <label for="name">Název</label>
+        <input id="name" class="form-control" type="text" name="name" required value="{{ post.name ?: '' }}" maxlength="255">
+    </div>
+    <div class="mb-3">
+        <label for="shortcut">Zkratka</label>
+        <input id="shortcut" class="form-control" type="text" name="shortcut" required value="{{ post.shortcut ?: '' }}" maxlength="20">
+    </div>
+    <div class="mb-3">
+        <input type="submit" class="btn btn-outline-success" name="admin_subjects_edit_form" value="Upravit">
+    </div>
+</form>

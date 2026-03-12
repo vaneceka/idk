@@ -1,0 +1,26 @@
+<div class="mb-3">
+    Počet záznamů
+    <div>
+        <label>Od <input type="number" name="table[min]" value="{{ post.table['min'] ?: '15' }}" step="1" min="1" class="form-control d-inline w-auto"></label>
+        <label>do <input type="number" name="table[max]" value="{{ post.table['max'] ?: '22' }}" step="1" min="1" class="form-control d-inline w-auto"></label>
+    </div>
+</div>
+<div class="mb-3">
+    Typ generátoru
+    <label class="d-block">
+        <input name="table[generators][]" value="Bmi" type="checkbox" {{ not post.table['generators'] or 'Bmi' in post.table['generators'] ? 'checked' }}>
+        BMI
+    </label>
+    <label class="d-block">
+        <input name="table[generators][]" value="BloodPressure" type="checkbox" {{ not post.table['generators'] or 'BloodPressure' in post.table['generators'] ? 'checked' }}>
+        Krevní tlak
+    </label>
+    <label class="d-block">
+        <input name="table[generators][]" value="Hospitalization" type="checkbox" {{ not post.table['generators'] or 'Hospitalization' in post.table['generators'] ? 'checked' }}>
+        Hospitalizace pacientů
+    </label>
+    <label class="d-block">
+        <input name="table[generators][]" value="Diagnosis" type="checkbox" {{ not post.table['generators'] or 'Diagnosis' in post.table['generators'] ? 'checked' }}>
+        Počet diagnóz
+    </label>
+</div>

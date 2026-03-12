@@ -1,0 +1,41 @@
+<h1>Rozvrhové akce předmětu {{ subject.shortcut }}</h1>
+<div class="table-responsive mt-2">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Den</th>
+            <th>Čas od</th>
+            <th>Čas do</th>
+            <th>Akce</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% set dayNames = {
+            1: 'Pondělí',
+            2: 'Úterý',
+            3: 'Středa',
+            4: 'Čtvrtek',
+            5: 'Pátek',
+            6: 'Sobota',
+            7: 'Neděle'
+        } %}
+
+        {% for event in events %}
+            <tr>
+                <td>
+                    {% if event.isExam %}
+                        {{ event.examDate|date("j. n. Y") }} - Zkouškový termín
+                    {% else %}
+                        {{ dayNames[event.day] | default(event.day) }}
+                    {% endif %}
+                </td>
+                <td>{{ event.timeFrom }}</td>
+                <td>{{ event.timeTo }}</td>
+                <td>
+                    <a class="btn btn-sm btn-outline-primary" href="{{ createLink('admin/students', { event: event.id }) }}">Otevřít</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

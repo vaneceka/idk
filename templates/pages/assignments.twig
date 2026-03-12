@@ -1,0 +1,12 @@
+{% extends "layout.twig" %}
+
+{% block title %}Zadání | {% endblock %}
+{% block content %}
+    <section>
+        {% if assignment %}
+            {% include 'components/assignments/detail.twig' %}
+        {% else %}
+            {% include 'components/assignments/default.twig' %}
+        {% endif %}
+    </section>
+{% endblock %}

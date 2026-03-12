@@ -1,0 +1,58 @@
+<div class="mb-3">
+    <label for="type">Typ</label>
+    <select id="type" name="type" class="form-select" required>
+        <option value="regular" {{ post.type == 'regular' ? 'selected' }}>Pravidelná rozvrhová akce</option>
+        <option value="exam" {{ post.type == 'exam' ? 'selected' }}>Zkouškový termín</option>
+    </select>
+</div>
+<div class="mb-3" id="regular" style="display: {{ not post.type or post.type == 'regular' ? 'block' : 'none' }}">
+    <label for="day">Den</label>
+    <select id="day" name="day" {{ post.type == 'regular' ? 'required' }} class="form-select">
+        <option value="1" {{ post.day == '1' ? 'selected' }}>Pondělí</option>
+        <option value="2" {{ post.day == '2' ? 'selected' }}>Úterý</option>
+        <option value="3" {{ post.day == '3' ? 'selected' }}>Středa</option>
+        <option value="4" {{ post.day == '4' ? 'selected' }}>Čtvrtek</option>
+        <option value="5" {{ post.day == '5' ? 'selected' }}>Pátek</option>
+        <option value="6" {{ post.day == '6' ? 'selected' }}>Sobota</option>
+        <option value="7" {{ post.day == '7' ? 'selected' }}>Neděle</option>
+    </select>
+</div>
+<div class="mb-3" id="exam" style="display: {{ post.type == 'exam' ? 'block' : 'none' }}">
+    <label for="day_exam">Den zkoušky</label>
+    <input type="date" id="day_exam" name="day_exam" {{ post.type == 'exam' ? 'required' }} value="{{ post.day_exam ?: '' }}" class="form-control">
+</div>
+<script>
+    initToggleSwitching('type', 'regular', 'exam', 'regular', true);
+</script>
+<div class="mb-3">
+    <div class="row">
+        <div class="col-sm-6">
+            <label for="timeFrom">Čas od</label>
+            <input id="timeFrom" class="form-control" type="time" name="timeFrom" required value="{{ post.timeFrom ?: '' }}">
+        </div>
+        <div class="col-sm-6">
+            <label for="timeTo">Čas do</label>
+            <input id="timeTo" class="form-control" type="time" name="timeTo" required value="{{ post.timeTo ?: '' }}">
+        </div>
+    </div>
+</div>
+<div class="mb-3">
+    <fieldset>
+        <legend>Vyučující</legend>
+        <label class="pb-1 mb-2 border-bottom">
+            <input type="checkbox" id="all-teachers">
+            Všichni vyučující
+        </label>
+        {% for teacher in teachers %}
+            <div>
+                <label>
+                    <input type="checkbox" name="teachers[]" value="{{ teacher.id }}" {{ teacher.id in post.teachers ? 'checked' }}>
+                    {{ teacher.name }} {{ teacher.surname }} ({{ teacher.username }})
+                </label>
+            </div>
+        {% endfor %}
+    </fieldset>
+    <script>
+        initCheckboxToggling('teachers[]', 'all-teachers');
+    </script>
+</div>

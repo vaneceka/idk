@@ -1,0 +1,238 @@
+<h1>Vygenerované zadání {{ assignment.name }} - {{ student.surname|upper }} {{ student.name }}</h1>
+{% if details.attempts > 0 %}
+    <h2>Odevzdané soubory</h2>
+    <div class="row">
+        <div class="col-lg-7">
+            <div class="table-responsive mt-2">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Pokus</th>
+                        <th>Název</th>
+                        <th>Čas odevzdání</th>
+                        <th>Akce</th>
+                        <th>Penalizace</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% set i = details.attempts %}
+                    {% for file in files %}
+                        {% if file.filetype is constant('\\App\\Model\\Database\\Types\\FileType::UPLOAD') %}
+                          {% set isLatest = (i == details.attempts) %}
+                          {% set isPrimary = primaryUpload and (primaryUpload.id == file.id) %}
+                            <tr {{ i == details.attempts ? 'class="fw-bold"' }}>
+                                <td>{{ i }}</td>
+                                {% set i = i - 1 %}
+                                <td>{{ file.filename }}</td>
+                                <td>{{ file.time|date("j. n. Y H:i:s") }}</td>
+                                <td>
+                                    <a class="btn btn-sm btn-outline-primary" href="{{ createLink('admin/students', { action: 'download', event: event.id, id: student.id, assignment: assignment.id, file: file.id }) }}">Stáhnout</a>
+                                    {% if isPrimary %}
+                                      <button type="button" class="btn btn-sm btn-warning" disabled>
+                                        Hlavní
+                                      </button>
+                                    {% else %}
+                                      <a class="btn btn-sm btn-outline-secondary"
+                                        href="{{ createLink('admin/students', { event: event.id, action: 'show', assignment: assignment.id, id: student.id, setPrimary: file.id }) }}">
+                                        Nastavit jako hlavní
+                                      </a>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center" style="width:120px;">
+                                    {% set p = uploadPenalties[file.id] ?? null %}
+                                    {% if p is same as(null) %}
+                                      <span class="text-muted">—</span>
+                                    {% else %}
+                                      <span class="badge {{ p < 0 ? 'bg-danger' : 'bg-success' }}">{{ p }}</span>
+                                    {% endif %}
+                                  </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <form method="post" action="{{ currentUrl }}">
+                <div class="mb-3">
+                    <label for="result">Hodnocení</label>
+                    <select name="result" id="result" class="form-select" required>
+                        <option value="{{ constant('\\App\\Model\\Database\\Types\\AssignmentState::NEW').value }}" {{ not details.state or details.state is constant('\\App\\Model\\Database\\Types\\AssignmentState::NEW') ? 'selected' }}>{{ constant('\\App\\Model\\Database\\Types\\AssignmentState::NEW').getText() }}</option>
+                        <option value="{{ constant('\\App\\Model\\Database\\Types\\AssignmentState::ACCEPTED').value }}" {{ details.state is constant('\\App\\Model\\Database\\Types\\AssignmentState::ACCEPTED') ? 'selected' }}>{{ constant('\\App\\Model\\Database\\Types\\AssignmentState::ACCEPTED').getText() }}</option>
+                        <option value="{{ constant('\\App\\Model\\Database\\Types\\AssignmentState::RETURNED').value }}" {{ details.state is constant('\\App\\Model\\Database\\Types\\AssignmentState::RETURNED') ? 'selected' }}>{{ constant('\\App\\Model\\Database\\Types\\AssignmentState::RETURNED').getText() }}</option>
+                        <option value="{{ constant('\\App\\Model\\Database\\Types\\AssignmentState::REJECTED').value }}" {{ details.state is constant('\\App\\Model\\Database\\Types\\AssignmentState::REJECTED') ? 'selected' }}>{{ constant('\\App\\Model\\Database\\Types\\AssignmentState::REJECTED').getText() }}</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                   <div class="d-flex align-items-center gap-2 mb-1">
+                    <label for="comment" class="mb-0">Komentář</label>
+
+                    {% if suggestedComment is not empty %}
+                      <input type="hidden" id="suggestedComment"
+                            value="{{ suggestedComment|e('html_attr') }}">
+
+                      <button type="button" class="btn btn-outline-secondary btn-sm py-1"
+                              onclick="(function(){
+                                const ta = document.getElementById('comment');
+                                const v = document.getElementById('suggestedComment').value;
+
+                                if (!ta.value.trim()) ta.value = v;
+                                else ta.value = ta.value.trim() + '\n\n' + v;
+
+                                ta.focus();
+                              })();">
+                        Vložit návrh
+                      </button>
+                    {% endif %}
+                  </div>
+
+                  <textarea id="comment" class="form-control" name="comment" rows="3">{{ details.result }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <input type="submit" name="admin_students_rate_form" value="Ohodnotit" class="btn btn-success">
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr>
+{% endif %}
+
+{% if checkerReport %}
+  <h2 id="auto-check" class="mb-2">Automatická kontrola</h2>
+
+  {# Vyfiltrujeme chyby a rovnou je seřadíme od největší penalizace (nejmenší body) #}
+  {% set failedAll = checkerReport.entries|filter(e => e.passed == false)|sort((a, b) => a.points <=> b.points) %}
+  {% set ignoredCount = checkerReport.entries|filter(e => (e.ignored ?? false) == true)|length %}
+
+  <form method="post"
+    action="{{ createLink('admin/students', { event: event.id, action: 'show', assignment: assignment.id, id: student.id }) }}">
+    <input type="hidden" name="checker_ignore_form" value="1">
+
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+      <div class="px-3 py-2 rounded border bg-light text-center" style="min-width:170px;">
+        <div class="small text-muted fw-semibold" style="line-height:1;">Penalizace</div>
+        <div class="fs-3 fw-bold" style="line-height:1;">{{ checkerReport.total_penalty }}</div>
+      </div>
+
+      <div class="ms-auto d-flex align-items-center gap-2">
+        {# Nový select pro řazení #}
+        <select id="errorSortSelect" class="form-select form-select-sm w-auto" onchange="sortCheckerErrors()">
+          <option value="penalty">Od největší penalizace</option>
+          <option value="category">Podle skupiny (kategorie)</option>
+        </select>
+        
+        <button type="submit" name="checker_ignore_save" value="1" class="btn btn-primary btn-sm">Uložit</button>
+      </div>
+    </div>
+
+    {% if failedAll|length == 0 %}
+      <div class="alert alert-success py-2 mb-3">Všechny kontroly prošly.</div>
+    {% else %}
+      {# Přidáno id="checker-errors-container" pro manipulaci v JS #}
+      <div id="checker-errors-container" class="border rounded p-2 bg-light" style="height:360px; overflow:auto; resize:vertical; min-height:200px;">
+        {% for e in failedAll %}
+          {% set isIgnored = (e.ignored ?? false) %}
+
+          {# Přidána třída "checker-error-item" a data atributy pro body a kategorii #}
+          <div class="checker-error-item bg-white border rounded p-2 mb-2 {{ isIgnored ? 'opacity-50' : '' }}"
+            data-points="{{ e.points }}"
+            data-category="{{ e.category|escape('html_attr') }}">
+            <div class="d-flex align-items-stretch gap-2">
+              <div class="flex-grow-1 min-w-0">
+                <div class="d-flex align-items-center gap-2 flex-wrap" style="line-height:1.2;">
+                  <div class="fw-semibold">
+                    {{ e.code }} — {{ e.name }}
+                    {% if isIgnored %}
+                      <span class="badge text-bg-secondary ms-2">Ignorováno</span>
+                    {% endif %}
+                  </div>
+
+                  <span class="badge {{ isIgnored ? 'bg-secondary' : 'bg-danger' }} px-2 py-1" style="min-width:44px; text-align:center;">{{ e.points }}</span>
+                </div>
+
+                <div class="text-muted small" style="line-height:1.2;">
+                  {{ e.category }}
+                </div>
+
+                {% if e.message %}
+                  <div class="mt-2 small" style="white-space:pre-line; word-break:break-word; margin:0;">
+                    {{ e.message|trim }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width:170px;">
+                <div class="form-check m-0 d-flex align-items-center gap-1">
+                  <input class="form-check-input m-0"
+                         type="checkbox"
+                         name="ignore[{{ e.code }}]"
+                         value="1"
+                         {% if isIgnored %}checked{% endif %}>
+                  <label class="form-check-label small m-0">Nezapočítat</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      {# JavaScript pro řazení chyb přímo v prohlížeči #}
+      <script>
+      function sortCheckerErrors() {
+          const container = document.getElementById('checker-errors-container');
+          if (!container) return;
+
+          const items = Array.from(container.getElementsByClassName('checker-error-item'));
+          const sortBy = document.getElementById('errorSortSelect').value;
+
+          items.sort((a, b) => {
+              if (sortBy === 'penalty') {
+                  // Od největší penalizace (což jsou nejnižší čísla: -100 je menší než -5)
+                  const pA = parseInt(a.getAttribute('data-points'), 10) || 0;
+                  const pB = parseInt(b.getAttribute('data-points'), 10) || 0;
+                  return pA - pB; 
+              } else if (sortBy === 'category') {
+                  // Abecedně podle kategorie
+                  const cA = a.getAttribute('data-category') || '';
+                  const cB = b.getAttribute('data-category') || '';
+                  return cA.localeCompare(cB, 'cs'); // 'cs' zajistí správné české řazení (např. Ch, háčky)
+              }
+              return 0;
+          });
+
+          // Přeskládání položek v DOMu (přidáním se existující element jen přesune na konec)
+          items.forEach(item => container.appendChild(item));
+      }
+      </script>
+    {% endif %}
+  </form>
+
+  <hr class="mt-3">
+{% endif %}
+
+<h2>Soubory zadání</h2>
+<div class="table-responsive mt-2">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Název</th>
+            <th>Typ</th>
+            <th>Akce</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for file in files %}
+            {% if file.filetype is not constant('\\App\\Model\\Database\\Types\\FileType::UPLOAD') %}
+                <tr>
+                    <td>{{ file.filename }}</td>
+                    <td>{{ file.filetype.getName() }}</td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary" href="{{ createLink('admin/students', { action: 'download', event: event.id, id: student.id, assignment: assignment.id, file: file.id }) }}">Stáhnout</a>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,27 @@
+<h1>Nastavení předmětů ({{ currentSemester.getName() }} semestr {{ currentYear }}/{{ currentYear + 1 }})</h1>
+<a class="btn btn-outline-success" href="{{ createLink('admin/subjects', { action: 'add' }) }}">
+    Přidat
+</a>
+<div class="table-responsive mt-2">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Zkratka</th>
+            <th>Předmět</th>
+            <th>Akce</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for subject in subjects %}
+            <tr>
+                <td>{{ subject.shortcut }}</td>
+                <td>{{ subject.name }}</td>
+                <td>
+                    <a class="btn btn-sm btn-outline-primary" href="{{ createLink('admin/subjects', { action: 'events', id: subject.id }) }}">Otevřít</a>
+                    <a class="btn btn-sm btn-outline-success" href="{{ createLink('admin/subjects', { action: 'edit', id: subject.id }) }}">Upravit</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
