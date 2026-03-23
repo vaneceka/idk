@@ -112,7 +112,7 @@ class TextDocument
                 'desky-nazev-prace' => [
                     'type' => 'Times New Roman',
                     'basedOn' => 'desky-fakulta',
-                    'size' => 18,
+                    'size' => 36,
                     'bold' => true,
                     'allCaps' => true,
                     'alignment' => Jc::CENTER,

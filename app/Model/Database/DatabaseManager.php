@@ -1689,6 +1689,13 @@ class DatabaseManager
         return true;
     }
 
+    /**
+     * Vrátí studenty, kteří odevzdali všechna zadání v dané akci.
+     *
+     * @param int $scheduledEventId ID vypsané akce
+     * @return array seznam studentů, kteří mají odevzdané všechna zadání
+     * @author Adam Vaněček
+     */
     public function getStudentsFullySubmittedByEvent(int $scheduledEventId): array
     {
         $stmt = $this->pdo->prepare(<<<SQL
@@ -1722,26 +1729,14 @@ class DatabaseManager
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
-    public function getUploadedAssignmentIdsForStudentOnEvent(int $eventId, int $studentId): array
-    {
-        $stmt = $this->pdo->prepare(<<<SQL
-            SELECT DISTINCT af.assignment_id
-            FROM assignment_files af
-            JOIN assignments a ON a.id = af.assignment_id
-            WHERE a.scheduled_event_id = :event_id
-            AND af.student_id = :student_id
-            AND af.filetype = :upload_type
-        SQL);
-
-        $stmt->bindValue(':event_id', $eventId, PDO::PARAM_INT);
-        $stmt->bindValue(':student_id', $studentId, PDO::PARAM_INT);
-        $stmt->bindValue(':upload_type', FileType::UPLOAD->value, PDO::PARAM_INT);
-        $stmt->execute();
-
-        $rows = $stmt->fetchAll(PDO::FETCH_COLUMN) ?: [];
-        return array_map('intval', $rows);
-    }
-
+    /**
+     * Vrátí celkový stav studenta napříč všemi zadáními v dané akci.
+     *
+     * @param int $eventId ID vypsané akce
+     * @param int $studentId ID studenta
+     * @return AssignmentState|null celkový stav studenta, nebo null pokud není k dispozici
+     * @author Adam Vaněček
+     */
     public function getOverallStateForStudentOnEvent(int $eventId, int $studentId): ?AssignmentState
     {
         $stmt = $this->pdo->prepare(<<<SQL
@@ -1774,6 +1769,14 @@ class DatabaseManager
         return AssignmentState::ACCEPTED;
     }
 
+    /**
+     * Vrátí čas posledního odevzdání studenta v dané akci.
+     *
+     * @param int $eventId ID vypsané akce
+     * @param int $studentId ID studenta
+     * @return \DateTime|null datum a čas posledního nahrání, nebo null pokud neexistuje
+     * @author Adam Vaněček
+     */
     public function getLatestUploadTimeForStudentOnEvent(int $eventId, int $studentId): ?\DateTime
     {
         $stmt = $this->pdo->prepare(<<<SQL
@@ -1796,7 +1799,13 @@ class DatabaseManager
         return new \DateTime((string)$val);
     }
 
-    // pro kongig
+    /**
+     * Načte uloženou konfiguraci kontrol pro daný předmět.
+     *
+     * @param int $subjectId ID předmětu
+     * @return array|null konfigurace kontrol, nebo null pokud neexistuje
+     * @author Adam Vaněček
+     */
     public function getChecksConfigBySubjectId(int $subjectId): ?array
     {
         $row = $this->queryOne(
@@ -1810,6 +1819,16 @@ class DatabaseManager
         return is_array($data) ? $data : null;
     }
 
+
+    /**
+     * Uloží konfiguraci textových a tabulkových kontrol pro daný předmět.
+     *
+     * @param int $subjectId ID předmětu
+     * @param array $text konfigurace textových kontrol
+     * @param array $spreadsheet konfigurace tabulkových kontrol
+     * @return bool true, pokud se operace podařila, jinak false
+     * @author Adam Vaněček
+     */
     public function saveChecksConfigForSubject(int $subjectId, array $text, array $spreadsheet): bool
     {
         $payload = json_encode([
@@ -1827,9 +1846,18 @@ class DatabaseManager
         return $stmt->execute([$subjectId, $payload]);
     }
 
+    /**
+     * Načte definice kontrol daného typu z registry JSON souboru.
+     *
+     * @param string $type typ kontrol
+     * @return array seznam definic kontrol daného typu
+     * @author Adam Vaněček
+     */
     public function getAllCheckDefinitions(string $type): array
-    {
-         $registryPath = '/bp/checks_config/checks_registry.json';
+    {   
+        
+        // $registryPath = CHECKER_REGISTRY;
+        $registryPath = '/checker/checks/checks_config/checks_registry.json';
 
         if (!is_file($registryPath)) {
             return [];
@@ -1863,6 +1891,14 @@ class DatabaseManager
         return $out;
     }
 
+    /**
+     * Vrátí jeden řádek z databáze podle zadaného dotazu.
+     *
+     * @param string $sql SQL dotaz
+     * @param array $params parametry pro SQL dotaz
+     * @return array|null nalezený řádek, nebo null pokud neexistuje
+     * @author Adam Vaněček
+     */
     private function queryOne(string $sql, array $params = []): ?array
     {
         $stmt = $this->pdo->prepare($sql);
@@ -1872,6 +1908,13 @@ class DatabaseManager
         return $row !== false ? $row : null;
     }
 
+    /**
+     * Vrátí ID předmětu podle ID zadání.
+     *
+     * @param int $assignmentId ID zadání
+     * @return int|null ID předmětu, nebo null pokud nebyl nalezen
+     * @author Adam Vaněček
+     */
     public function getSubjectIdByAssignmentId(int $assignmentId): ?int
     {
         $row = $this->queryOne(

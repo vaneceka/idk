@@ -105,6 +105,7 @@ class AssignmentsController extends Controller
 
         return $out;
     }
+    
     /**
      * Metoda slouží pro zpracování formuláře na odevzdání souboru s vypracováním.
      *
@@ -172,18 +173,30 @@ class AssignmentsController extends Controller
                 throw new \RuntimeException("Nelze zapsat configPath: {$configPath}. " . ($err['message'] ?? ''));
             }
 
-            $python = '/opt/bp-venv/bin/python';
-            $script = 'main.py';
+            define('CHECKER_WORKDIR', '/checker');
 
-            $cmd = 'cd /bp && ' .
-                escapeshellcmd($python) . ' ' . escapeshellarg($script) .
+            $runner = CHECKER_WORKDIR . '/bin/run_checker.sh';
+            $cmd = 'cd ' . escapeshellarg(CHECKER_WORKDIR) . ' && ' .
+                escapeshellcmd($runner) .
                 ' --student-dir ' . escapeshellarg($studentDir) .
                 ' --out-dir ' . escapeshellarg($studentDir) .
                 ' --output ' . escapeshellarg('json') .
                 ' --checks-config ' . escapeshellarg($configPath) .
                 ' >> ' . escapeshellarg($logFile) . ' 2>&1 &';
-            
             exec($cmd);
+
+            // $runner = CHECKER_WORKDIR . '/bin/run_checker.sh';
+
+            // $cmd = 'cd ' . escapeshellarg(CHECKER_WORKDIR) . ' && ' .
+            //     escapeshellcmd($runner) .
+            //     ' --student-dir ' . escapeshellarg($studentDir) .
+            //     ' --out-dir ' . escapeshellarg($studentDir) .
+            //     ' --output ' . escapeshellarg('json') .
+            //     ' --checks-config ' . escapeshellarg($configPath) .
+            //     ' >> ' . escapeshellarg($logFile) . ' 2>&1 &';
+
+            // exec($cmd);
+
             $this->getDatabase()->log(
                 "Automatická kontrola byla zařazena do fronty (zadání ID={$assignment->id}).",
                 LogType::SUBMIT,

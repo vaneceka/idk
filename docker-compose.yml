@@ -29,4 +29,4 @@ services:
             - '.:/application'
             - './phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/8.3/fpm/conf.d/99-overrides.ini'
             - './phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/8.3/cli/conf.d/99-overrides.ini'
-            - '/Users/adam/Projekty/bakalarska-prace/BP:/bp'
+            - '/Users/adam/Projekty/bakalarska-prace/checker:/checker'

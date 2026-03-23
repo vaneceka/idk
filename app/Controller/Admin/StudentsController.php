@@ -113,6 +113,14 @@ class StudentsController extends BaseAdminController
 
     // AKCE
     # konfig
+    /**
+     * Zobrazí a zpracuje konfiguraci kontrol pro danou vypsanou akci a předmět.
+     *
+     * @param ScheduledEvent $event vypsaná akce
+     * @param Subject|null $subject předmět přiřazený k akci
+     * @return void
+     * @author Adam Vaněček
+     */
     private function actionChecksConfig(ScheduledEvent $event, ?Subject $subject): void
     {   
         if (!$subject) {
@@ -185,6 +193,14 @@ class StudentsController extends BaseAdminController
         $this->templateData['event'] = $event;
     }
 
+    /**
+     * Očistí mapu povolených kontrol podle výchozí mapy.
+     *
+     * @param mixed $raw vstupní mapa hodnot
+     * @param array $defaultMap výchozí mapa kontrol
+     * @return array výsledná mapa povolených kontrol
+     * @author Adam Vaněček
+     */
     private function sanitizeEnabledMap($raw, array $defaultMap): array
     {
         $out = $defaultMap;
@@ -204,6 +220,14 @@ class StudentsController extends BaseAdminController
         return $out;
     }
 
+    /**
+     * Ověří, že sekce konfigurace má tvar asociativního pole s boolean hodnotami.
+     *
+     * @param mixed $raw vstupní data sekce konfigurace
+     * @param string $sectionName název sekce konfigurace
+     * @return array|null ověřená sekce konfigurace, nebo null při neplatném formátu
+     * @author Adam Vaněček
+     */           
     private function assertConfigSectionIsMap($raw, string $sectionName): ?array
     {
         if (!is_array($raw)) return null;
@@ -219,6 +243,16 @@ class StudentsController extends BaseAdminController
         return $raw;
     }
 
+    /**
+     * Zpracuje nahrání JSON konfigurace kontrol pro daný předmět.
+     *
+     * @param ScheduledEvent $event vypsaná akce
+     * @param Subject $subject předmět přiřazený k akci
+     * @param array $defaultTextMap výchozí mapa textových kontrol
+     * @param array $defaultSheetMap výchozí mapa tabulkových kontrol
+     * @return void
+     * @author Adam Vaněček
+     */
     private function processChecksConfigUploadForm(
         ScheduledEvent $event,
         Subject $subject,
@@ -268,6 +302,16 @@ class StudentsController extends BaseAdminController
         $this->redirect('admin/students', ['event' => $event->id, 'action' => 'checks-config']);
     }
 
+    /**
+     * Zpracuje ruční uložení konfigurace kontrol pro daný předmět.
+     *
+     * @param ScheduledEvent $event vypsaná akce
+     * @param Subject $subject předmět přiřazený k akci
+     * @param array $defaultTextMap výchozí mapa textových kontrol
+     * @param array $defaultSheetMap výchozí mapa tabulkových kontrol
+     * @return void
+     * @author Adam Vaněček
+     */
     private function processChecksConfigSaveForm(
         ScheduledEvent $event,
         Subject $subject,
@@ -299,9 +343,13 @@ class StudentsController extends BaseAdminController
         $this->redirect('admin/students', ['event' => $event->id, 'action' => 'checks-config']);
     }
 
-
-
-    # export csv
+    /**
+     * Rozdělí zkratku předmětu na katedru a samotnou zkratku.
+     *
+     * @param string $shortcut zkratka předmětu
+     * @return array pole obsahující katedru a zkratku předmětu
+     * @author Adam Vaněček
+     */
     private function splitSubjectShortcut(string $shortcut): array
     {
         $shortcut = trim($shortcut);
@@ -312,6 +360,13 @@ class StudentsController extends BaseAdminController
         return [$shortcut, $shortcut];
     }
 
+    /**
+     * Převede interní označení semestru na formát používaný ve STAGu.
+     *
+     * @param string $sem označení semestru
+     * @return string semestr ve formátu STAG
+     * @author Adam Vaněček
+     */
     private function semesterToStag(string $sem): string
     {
         $sem = strtoupper(trim($sem));
@@ -321,6 +376,13 @@ class StudentsController extends BaseAdminController
         return 'ZS';
     }
 
+    /**
+     * Vygeneruje CSV export studentů s kompletně odevzdanými zadáními pro STAG.
+     *
+     * @param ScheduledEvent $event vypsaná akce
+     * @return void
+     * @author Adam Vaněček
+     */
     private function actionExportSubmittedStagCsv(ScheduledEvent $event): void
     {
         $subject = $this->getDatabase()->getSubjectById($event->subjectId);
@@ -379,8 +441,6 @@ class StudentsController extends BaseAdminController
             'zk_ucit_jmeno',
         ];
         fputcsv($out, $header, ';');
-
-        
 
         foreach ($students as $s) {
             $state = $this->getDatabase()->getOverallStateForStudentOnEvent($event->id, (int)$s['id']);
@@ -757,18 +817,44 @@ class StudentsController extends BaseAdminController
         $this->redirect('admin/students', ['event' => $event->id]);
     }
     
+    /**
+     * Vrátí základní adresář pro soubory studenta a zadání.
+     *
+     * @param int $studentId ID studenta
+     * @param int $assignmentId ID zadání
+     * @return string cesta k základnímu adresáři
+     * @author Adam Vaněček
+     */
     private function getBaseDir(int $studentId, int $assignmentId): string
     {
         return rtrim(DOCUMENT_FOLDER, '/') . '/' . $studentId . '/' . $assignmentId;
     }
 
+    /**
+     * Načte informace o primárním odevzdání ze souboru.
+     *
+     * @param string $primaryPath cesta k souboru s primárním odevzdáním
+     * @return array|null data primárního odevzdání, nebo null pokud soubor neexistuje nebo je neplatný
+     * @author Adam Vaněček
+     */
     private function readPrimary(string $primaryPath): ?array
     {
         if (!is_file($primaryPath)) return null;
         $data = json_decode((string)file_get_contents($primaryPath), true);
         return is_array($data) ? $data : null;
     }
-
+    
+    /**
+     * Uloží informace o primárním odevzdání do souboru.
+     *
+     * @param string $baseDir základní adresář pro soubory
+     * @param string $primaryPath cesta k souboru s primárním odevzdáním
+     * @param mixed $upload objekt odevzdaného souboru
+     * @param int $seenLatestTime čas posledního známého odevzdání
+     * @param bool $manual určuje, zda bylo primární odevzdání nastaveno ručně
+     * @return void
+     * @author Adam Vaněček
+     */
     private function writePrimary(string $baseDir, string $primaryPath, $upload, int $seenLatestTime, bool $manual = false): void
     {
         if (!is_dir($baseDir)) mkdir($baseDir, 0775, true);
@@ -784,6 +870,14 @@ class StudentsController extends BaseAdminController
         file_put_contents($primaryPath, json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
     }
 
+    /**
+     * Určí primární odevzdání ze seznamu nahraných souborů.
+     *
+     * @param array $uploads seznam odevzdaných souborů
+     * @param string $primaryPath cesta k souboru s primárním odevzdáním
+     * @return object|null objekt primárního odevzdání, nebo null pokud žádné neexistuje
+     * @author Adam Vaněček
+     */
     private function resolvePrimaryUpload(array $uploads, string $primaryPath): ?object
     {
         if (empty($uploads)) return null;
@@ -798,13 +892,30 @@ class StudentsController extends BaseAdminController
         return $uploads[0];
     }
 
+    /**
+     * Převede časovou hodnotu na timestamp.
+     *
+     * @param mixed $time časová hodnota
+     * @return int čas ve formátu timestamp
+     * @author Adam Vaněček
+     */
     private function timeToTs($time): int
     {
         if ($time instanceof \DateTimeInterface) return $time->getTimestamp();
         if (is_numeric($time)) return (int)$time;
         return 0;
     }
-    
+            
+
+    /**
+     * Najde checker report odpovídající konkrétnímu odevzdanému souboru.
+     *
+     * @param string $baseDir základní adresář pro soubory
+     * @param string $uploadFilename název odevzdaného souboru
+     * @param mixed $uploadTime čas odevzdání souboru
+     * @return string|null cesta k reportu, nebo null pokud nebyl nalezen
+     * @author Adam Vaněček
+     */
     private function findReportForUpload(string $baseDir, string $uploadFilename, $uploadTime): ?string
     {
         $stem = pathinfo($uploadFilename, PATHINFO_FILENAME);
@@ -821,6 +932,14 @@ class StudentsController extends BaseAdminController
         return is_file($exact) ? $exact : null;
     }
 
+    /**
+     * Uloží nastavení ignorovaných checker chyb do reportu a přepočítá penalizaci.
+     *
+     * @param string $reportPath cesta k checker reportu
+     * @param array $ignorePost data z formuláře s ignorovanými chybami
+     * @return bool true, pokud se operace podařila, jinak false
+     * @author Adam Vaněček
+     */
     private function applyCheckerIgnoresToReport(string $reportPath, array $ignorePost): bool
     {
         if (!$reportPath || !is_file($reportPath)) {
@@ -832,7 +951,6 @@ class StudentsController extends BaseAdminController
             return false;
         }
 
-        // normalize ignore array
         $ignore = $ignorePost['ignore'] ?? [];
         if (!is_array($ignore)) $ignore = [];
 
@@ -843,7 +961,6 @@ class StudentsController extends BaseAdminController
         }
         unset($entry);
 
-        // recompute total_penalty with cap -100
         $total = 0;
         foreach ($data['entries'] as $entry) {
             $passed  = (bool)($entry['passed'] ?? false);
@@ -859,6 +976,16 @@ class StudentsController extends BaseAdminController
         return true;
     }
 
+    /**
+     * Zpracuje odeslání formuláře pro ignorování checker chyb.
+     *
+     * @param string|null $reportPath cesta k checker reportu
+     * @param ScheduledEvent $event vypsaná akce
+     * @param int $assignmentId ID zadání
+     * @param int $id ID studenta
+     * @return void
+     * @author Adam Vaněček
+     */
     private function handleCheckerIgnoreSubmit(
         ?string $reportPath,
         ScheduledEvent $event,
@@ -883,6 +1010,13 @@ class StudentsController extends BaseAdminController
         }
     }
 
+    /**
+     * Načte checker report ze souboru.
+     *
+     * @param string|null $reportPath cesta k checker reportu
+     * @return array|null data checker reportu, nebo null pokud soubor neexistuje nebo je neplatný
+     * @author Adam Vaněček
+     */
     private function loadCheckerReport(?string $reportPath): ?array
     {
         if (!$reportPath || !is_file($reportPath)) return null;
@@ -891,6 +1025,16 @@ class StudentsController extends BaseAdminController
         return is_array($data) ? $data : null;
     }
 
+    /**
+     * Zajistí, že primární odevzdání odpovídá nejnovějšímu dostupnému souboru.
+     *
+     * @param string $baseDir základní adresář pro soubory
+     * @param string $primaryPath cesta k souboru s primárním odevzdáním
+     * @param object|null $latestUpload nejnovější odevzdaný soubor
+     * @param int $latestTime čas nejnovějšího odevzdání
+     * @return void
+     * @author Adam Vaněček
+     */
     private function ensurePrimaryIsFresh(string $baseDir, string $primaryPath, ?object $latestUpload, int $latestTime): void
     {
         if (!$latestUpload) {
@@ -911,6 +1055,13 @@ class StudentsController extends BaseAdminController
         }
     }
 
+    /**
+     * Vytvoří návrh komentáře na základě checker reportu.
+     *
+     * @param array|null $checkerReport data checker reportu
+     * @return string navržený komentář k hodnocení
+     * @author Adam Vaněček
+     */
     private function buildSuggestedComment(?array $checkerReport): string
     {
         if (!is_array($checkerReport) || !isset($checkerReport['entries']) || !is_array($checkerReport['entries'])) {
@@ -939,6 +1090,14 @@ class StudentsController extends BaseAdminController
         return trim(implode("\n", $lines));
     }
 
+    /**
+     * Sestaví přehled penalizací pro jednotlivá odevzdání.
+     *
+     * @param string $baseDir základní adresář pro soubory
+     * @param array $uploads seznam odevzdaných souborů
+     * @return array mapa penalizací podle ID odevzdání
+     * @author Adam Vaněček
+     */
     private function buildUploadPenalties(string $baseDir, array $uploads): array
     {
         $penalties = [];
@@ -999,6 +1158,7 @@ class StudentsController extends BaseAdminController
         $this->templateData['details'] = $details;
         $this->templateData['files'] = $this->getDatabase()->getStudentAssignmentFiles($assignmentId, $id);
         
+        // Author Adam Vaněček
         $files = $this->getDatabase()->getStudentAssignmentFiles($assignmentId, $id);
         $this->templateData['files'] = $files;
 
@@ -1054,7 +1214,7 @@ class StudentsController extends BaseAdminController
 
         $this->templateData['suggestedComment'] = $suggestedComment;
         $this->templateData['checkerReport'] = $checkerReport;
-                
+        // Author Adam Vaněček
     }
 
     /**

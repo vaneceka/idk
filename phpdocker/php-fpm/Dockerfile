@@ -11,3 +11,6 @@ RUN apt-get update \
 # vytvoř venv
 RUN python3 -m venv /opt/bp-venv \
     && /opt/bp-venv/bin/pip install --no-cache-dir -U pip setuptools wheel
+
+# COPY checker/requirements.txt /tmp/checker-requirements.txt
+# RUN /opt/bp-venv/bin/pip install --no-cache-dir -r /tmp/checker-requirements.txt
