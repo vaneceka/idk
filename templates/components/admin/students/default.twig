@@ -13,9 +13,6 @@
 <a class="btn btn-outline-primary" href="{{ createLink('admin/students', { action: 'add-assignment', event: event.id }) }}">
     Vytvořit zadání
 </a>
-<a class="btn btn-outline-primary" href="{{ createLink('admin/students', { action: 'checks-config', event: event.id }) }}">
-    Konfigurace kontrol
-</a>
 <div class="table-responsive mt-2">
     <table class="table table-bordered">
         <thead>
@@ -36,6 +33,7 @@
                     <a class="btn btn-sm btn-outline-success" href="{{ createLink('admin/students', { action: 'edit-assignment', event: event.id, id: assignment.id }) }}">Upravit</a>
                     <a class="btn btn-sm btn-outline-danger" onclick="return confirm('Opravdu chcete vygenerovat zadání všem přiřazeným studentům? Tato akce může chvíli trvat')" href="{{ createLink('admin/students', { action: 'generate-all', event: event.id, assignment: assignment.id }) }}">Vygenerovat přiřazeným studentům</a>
                     <a class="btn btn-sm btn-outline-primary" href="{{ createLink('admin/students', { action: 'download-all', event: event.id, assignment: assignment.id }) }}">Stáhnout vše</a>
+                    <a class="btn btn-sm btn-outline-primary" href="{{ createLink('admin/students', { action: 'checks-config', event: event.id, assignment: assignment.id }) }}"> Konfigurace kontrol </a>
                 </td>
             </tr>
         {% endfor %}

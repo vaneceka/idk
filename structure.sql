@@ -34,17 +34,16 @@ CREATE TABLE `scheduled_events` (
     CONSTRAINT `scheduled_events_ibfk_1` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
 
-CREATE TABLE IF NOT EXISTS `checks_config` (
-  `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `subject_id` BIGINT(20) UNSIGNED NOT NULL,
-  `config_json` LONGTEXT NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uniq_checks_config_subject` (`subject_id`),
-  CONSTRAINT `checks_config_fk_subject`
-    FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`)
-    ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
-
+-- CREATE TABLE IF NOT EXISTS `checks_config` (
+--   `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+--   `subject_id` BIGINT(20) UNSIGNED NOT NULL,
+--   `config_json` LONGTEXT NOT NULL,
+--   PRIMARY KEY (`id`),
+--   UNIQUE KEY `uniq_checks_config_subject` (`subject_id`),
+--   CONSTRAINT `checks_config_fk_subject`
+--     FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`)
+--     ON DELETE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
 
 DROP TABLE IF EXISTS `students`;
 CREATE TABLE `students` (
@@ -103,6 +102,17 @@ CREATE TABLE `assignment_files` (
     KEY `student_id` (`student_id`),
     CONSTRAINT `assignment_files_ibfk_1` FOREIGN KEY (`assignment_id`) REFERENCES `assignments` (`id`),
     CONSTRAINT `assignment_files_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+
+CREATE TABLE IF NOT EXISTS `checks_config` (
+  `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `assignment_id` BIGINT(20) UNSIGNED NOT NULL,
+  `config_json` LONGTEXT NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_checks_config_assignment` (`assignment_id`),
+  CONSTRAINT `checks_config_fk_assignment`
+    FOREIGN KEY (`assignment_id`) REFERENCES `assignments` (`id`)
+    ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
 
 DROP TABLE IF EXISTS `users`;

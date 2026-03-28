@@ -64,6 +64,77 @@
                     </div>
                     <div class="mb-3">
                         <input type="submit" name="submit_attachment_form" class="btn btn-success" value="Odevzdat">
+                        {% if canShowValidatorReport %}
+                            <div class="mt-3">
+                                <button
+                                    class="btn btn-outline-secondary" type="button" onclick="toggleValidatorReport()"id="validatorReportToggleBtn">
+                                    {% if showValidatorReportSection %}
+                                        Skrýt automatickou kontrolu validátorem
+                                    {% else %}
+                                        Zobrazit automatickou kontrolu validátorem
+                                    {% endif %}
+                                </button>
+                            </div>
+                        {% endif %}
+
+                        {% if canShowValidatorReport %}
+                            <div id="validatorReportWrapper" class="mt-4" style="{% if not showValidatorReportSection %}display:none;{% endif %}">
+                                <hr class="mt-4">
+
+                                <h2>Automatická kontrola</h2>
+
+                                {% if checkerReport %}
+                                    <div class="mb-3">
+                                        <strong>Penalizace:</strong> {{ checkerReport.total_penalty }}
+                                    </div>
+
+                                    {% set failedAll = checkerReport.entries |filter(e => e.passed == false and (e.points|abs) >= studentViewMinPenalty) | sort((a, b) => a.points <=> b.points) %}
+
+                                    {% if failedAll|length == 0 %}
+                                        <div class="alert alert-success">Všechny kontroly prošly.</div>
+                                    {% else %}
+                                        <div class="border rounded p-2 bg-light" style="height: 350px; overflow: auto; resize: vertical; min-height: 180px;">
+                                            {% for e in failedAll %}
+                                                <div class="bg-white border rounded p-2 mb-2">
+                                                    <div class="fw-semibold">{{ e.code }} — {{ e.name }}</div>
+                                                    <div class="text-muted small">{{ e.category }}</div>
+                                                    <div class="small">Body: {{ e.points }}</div>
+
+                                                    {% if e.message %}
+                                                        <div class="mt-2 small" style="white-space: pre-line; word-break: break-word;">
+                                                            {{ e.message|trim }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="alert alert-warning">
+                                        Výsledek automatické kontroly zatím není dostupný.
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <script>
+                                function toggleValidatorReport() {
+                                    const wrapper = document.getElementById('validatorReportWrapper');
+                                    const btn = document.getElementById('validatorReportToggleBtn');
+
+                                    if (!wrapper || !btn) return;
+
+                                    const isHidden = wrapper.style.display === 'none' || wrapper.style.display === '';
+
+                                    if (isHidden) {
+                                        wrapper.style.display = 'block';
+                                        btn.textContent = 'Skrýt automatickou kontrolu validátorem';
+                                    } else {
+                                        wrapper.style.display = 'none';
+                                        btn.textContent = 'Zobrazit automatickou kontrolu validátorem';
+                                    }
+                                }
+                            </script>
+                        {% endif %}
                     </div>
                 </form>
             {% else %}

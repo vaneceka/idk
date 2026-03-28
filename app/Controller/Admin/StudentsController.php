@@ -14,6 +14,9 @@ use App\Model\Database\Types\AssignmentState;
 use App\Model\Database\Types\LogType;
 use App\Model\Database\Types\Options;
 use App\Model\Database\Types\FileType;
+use App\Model\CheckerReportManager;
+use App\Model\ChecksConfigManager;
+use App\Model\StagExportManager;
 use DateTime;
 
 /**
@@ -102,7 +105,7 @@ class StudentsController extends BaseAdminController
                 $this->actionExportSubmittedStagCsv($event);
                 return;
             case 'checks-config':
-                $this->actionChecksConfig($event, $subject);
+                $this->actionChecksConfig($event);
                 break;
             default:
                 $this->error404();
@@ -112,58 +115,85 @@ class StudentsController extends BaseAdminController
     }
 
     // AKCE
-    # konfig
     /**
-     * Zobrazí a zpracuje konfiguraci kontrol pro danou vypsanou akci a předmět.
+     * Zobrazí a zpracuje konfiguraci kontrol pro konkrétní zadání.
+     * Konfigurace je navázána na konkrétní assignment, nikoliv na celý předmět.
+     * Podle typu profilu zadání se následně v šabloně zobrazí buď textové,
+     * nebo tabulkové kontroly.
      *
      * @param ScheduledEvent $event vypsaná akce
-     * @param Subject|null $subject předmět přiřazený k akci
      * @return void
      * @author Adam Vaněček
      */
-    private function actionChecksConfig(ScheduledEvent $event, ?Subject $subject): void
-    {   
-        if (!$subject) {
+    private function actionChecksConfig(ScheduledEvent $event): void
+    {
+        if (!isset($_GET['assignment'])) {
+            $this->error404();
+            return;
+        }
+        $configManager = new ChecksConfigManager();
+        $assignmentId = (int) $_GET['assignment'];
+        $assignment = $this->getDatabase()->getAssignmentById($assignmentId);
+
+        if (!$assignment || $assignment->scheduledEventId !== $event->id) {
             $this->error404();
             return;
         }
 
-        $textDefs  = $this->getDatabase()->getAllCheckDefinitions('text');
-        $sheetDefs = $this->getDatabase()->getAllCheckDefinitions('spreadsheet');
-
-        $defaultTextMap = [];
-        foreach ($textDefs as $d) {
-            $defaultTextMap[$d['code']] = (bool)($d['default_enabled'] ?? true);
+        $profile = $this->getDatabase()->getAssignmentProfileById($assignment->assignmentProfileId);
+        if (!$profile) {
+            $this->error404();
+            return;
         }
 
-        $defaultSheetMap = [];
-        foreach ($sheetDefs as $d) {
-            $defaultSheetMap[$d['code']] = (bool)($d['default_enabled'] ?? true);
-        }
+        $showTextChecks = $profile->type === \App\Model\Database\Types\ProfileType::DOCUMENT;
+        $showSheetChecks = $profile->type === \App\Model\Database\Types\ProfileType::TABLE_PROCESSOR;
 
-        $dbCfg = $this->getDatabase()->getChecksConfigBySubjectId($subject->id) ?? [];
+        $textDefs = $configManager->getAllCheckDefinitions('text');
+        $sheetDefs = $configManager->getAllCheckDefinitions('spreadsheet');
 
-        $textMap  = $this->sanitizeEnabledMap($dbCfg['text'] ?? null, $defaultTextMap);
-        $sheetMap = $this->sanitizeEnabledMap($dbCfg['spreadsheet'] ?? null, $defaultSheetMap);
+        $defaultTextMap = $configManager->buildDefaultMap($textDefs);
+        $defaultSheetMap = $configManager->buildDefaultMap($sheetDefs);
+
+        $dbCfg = $this->getDatabase()->getChecksConfigByAssignmentId($assignment->id) ?? [];
+
+        $textMap = $configManager->sanitizeEnabledMap($dbCfg['text'] ?? null, $defaultTextMap);
+        $sheetMap = $configManager->sanitizeEnabledMap($dbCfg['spreadsheet'] ?? null, $defaultSheetMap);
+
+        $studentViewCfg = is_array($dbCfg['student_view'] ?? null) ? $dbCfg['student_view'] : [];
+
+        $studentViewEnabled = (bool)($studentViewCfg['enabled'] ?? false);
+        $studentViewMinPenalty = abs((int)($studentViewCfg['min_penalty'] ?? 100));
 
         if (isset($_POST['admin_checks_config_upload'])) {
-            $this->processChecksConfigUploadForm($event, $subject, $defaultTextMap, $defaultSheetMap);
+            $this->processChecksConfigUploadForm($event, $assignment, $defaultTextMap, $defaultSheetMap);
             return;
         }
 
         if (isset($_POST['admin_checks_config_save'])) {
-            $this->processChecksConfigSaveForm($event, $subject, $defaultTextMap, $defaultSheetMap);
+            $this->processChecksConfigSaveForm($event, $assignment, $defaultTextMap, $defaultSheetMap);
             return;
         }
 
         if (isset($_POST['admin_checks_config_reset'])) {
-            $this->getDatabase()->saveChecksConfigForSubject($subject->id, $defaultTextMap, $defaultSheetMap);
+            $this->getDatabase()->saveChecksConfigForAssignment(
+                $assignment->id,
+                $defaultTextMap,
+                $defaultSheetMap,
+                false,
+                -100
+            );
             $this->getDatabase()->log(
-                "Konfigurace kontrol byla obnovena na výchozí (předmět ID={$subject->id}, akce ID={$event->id}).",
-                LogType::SUBMIT
+                "Konfigurace kontrol byla obnovena na výchozí (zadání ID={$assignment->id}, akce ID={$event->id}).",
+                LogType::SUBMIT,
+                userId: $this->loggedUser->id
             );
             $this->alertMessage('success', 'Konfigurace kontrol byla obnovena na výchozí.');
-            $this->redirect('admin/students', ['event' => $event->id, 'action' => 'checks-config']);
+            $this->redirect('admin/students', [
+                'event' => $event->id,
+                'action' => 'checks-config',
+                'assignment' => $assignment->id,
+            ]);
             return;
         }
 
@@ -187,67 +217,22 @@ class StudentsController extends BaseAdminController
             ];
         }
 
-        $this->templateData['textChecks']  = $textChecks;
+        $this->templateData['textChecks'] = $textChecks;
         $this->templateData['sheetChecks'] = $sheetChecks;
-        $this->templateData['subject'] = $subject;
+        $this->templateData['assignment'] = $assignment;
+        $this->templateData['profile'] = $profile;
+        $this->templateData['showTextChecks'] = $showTextChecks;
+        $this->templateData['showSheetChecks'] = $showSheetChecks;
         $this->templateData['event'] = $event;
+        $this->templateData['studentViewEnabled'] = $studentViewEnabled;
+        $this->templateData['studentViewMinPenalty'] = $studentViewMinPenalty;
     }
-
+    
     /**
-     * Očistí mapu povolených kontrol podle výchozí mapy.
-     *
-     * @param mixed $raw vstupní mapa hodnot
-     * @param array $defaultMap výchozí mapa kontrol
-     * @return array výsledná mapa povolených kontrol
-     * @author Adam Vaněček
-     */
-    private function sanitizeEnabledMap($raw, array $defaultMap): array
-    {
-        $out = $defaultMap;
-
-        if (!is_array($raw)) {
-            return $out;
-        }
-
-        foreach ($raw as $k => $v) {
-            if (!is_string($k) || !is_bool($v)) continue;
-            $k = trim($k);
-            if ($k === '') continue;
-            if (!array_key_exists($k, $out)) continue;
-            $out[$k] = $v;
-        }
-
-        return $out;
-    }
-
-    /**
-     * Ověří, že sekce konfigurace má tvar asociativního pole s boolean hodnotami.
-     *
-     * @param mixed $raw vstupní data sekce konfigurace
-     * @param string $sectionName název sekce konfigurace
-     * @return array|null ověřená sekce konfigurace, nebo null při neplatném formátu
-     * @author Adam Vaněček
-     */           
-    private function assertConfigSectionIsMap($raw, string $sectionName): ?array
-    {
-        if (!is_array($raw)) return null;
-
-        $keys = array_keys($raw);
-        $isList = ($keys === range(0, count($keys) - 1));
-        if ($isList) return null;
-
-        foreach ($raw as $k => $v) {
-            if (!is_string($k) || !is_bool($v)) return null;
-        }
-
-        return $raw;
-    }
-
-    /**
-     * Zpracuje nahrání JSON konfigurace kontrol pro daný předmět.
+     * Zpracuje nahrání JSON konfigurace kontrol pro konkrétní zadání.
      *
      * @param ScheduledEvent $event vypsaná akce
-     * @param Subject $subject předmět přiřazený k akci
+     * @param Assignment $assignment zadání, pro které se konfigurace ukládá
      * @param array $defaultTextMap výchozí mapa textových kontrol
      * @param array $defaultSheetMap výchozí mapa tabulkových kontrol
      * @return void
@@ -255,14 +240,10 @@ class StudentsController extends BaseAdminController
      */
     private function processChecksConfigUploadForm(
         ScheduledEvent $event,
-        Subject $subject,
+        Assignment $assignment,
         array $defaultTextMap,
         array $defaultSheetMap
     ): void {
-        
-        ini_set('display_errors', '1');
-        error_reporting(E_ALL);
-
         if (!isset($_FILES['file']['tmp_name'], $_FILES['file']['error']) || $_FILES['file']['error'] !== 0) {
             $this->alertMessage('danger', 'Musíte nahrát JSON soubor.');
             return;
@@ -280,33 +261,55 @@ class StudentsController extends BaseAdminController
             $this->alertMessage('danger', 'JSON musí obsahovat klíče "text" a "spreadsheet".');
             return;
         }
-
-        $textRaw  = $this->assertConfigSectionIsMap($data['text'], 'text');
-        $sheetRaw = $this->assertConfigSectionIsMap($data['spreadsheet'], 'spreadsheet');
+        
+        $configManager = new ChecksConfigManager();
+        $textRaw = $configManager->assertConfigSectionIsMap($data['text']);
+        $sheetRaw = $configManager->assertConfigSectionIsMap($data['spreadsheet']);
 
         if ($textRaw === null || $sheetRaw === null) {
             $this->alertMessage('danger', 'JSON musí mít formát mapy: "text": { "T_...": true/false } a "spreadsheet": { "S_...": true/false }.');
             return;
         }
 
-        $textMap  = $this->sanitizeEnabledMap($textRaw, $defaultTextMap);
-        $sheetMap = $this->sanitizeEnabledMap($sheetRaw, $defaultSheetMap);
+        $textMap = $configManager->sanitizeEnabledMap($textRaw, $defaultTextMap);
+        $sheetMap = $configManager->sanitizeEnabledMap($sheetRaw, $defaultSheetMap);
 
-        $this->getDatabase()->saveChecksConfigForSubject($subject->id, $textMap, $sheetMap);
-        $this->getDatabase()->log(
-            "Konfigurace kontrol byla nahrána (předmět ID={$subject->id}, akce ID={$event->id}).",
-            LogType::SUBMIT
+        $studentViewRaw = is_array($data['student_view'] ?? null) ? $data['student_view'] : [];
+
+        $studentViewEnabled = (bool)($studentViewRaw['enabled'] ?? false);
+
+        $studentViewMinPenalty = -100;
+        if (isset($studentViewRaw['min_penalty']) && is_numeric($studentViewRaw['min_penalty'])) {
+            $studentViewMinPenalty = (int)$studentViewRaw['min_penalty'];
+        }
+
+        $this->getDatabase()->saveChecksConfigForAssignment(
+            $assignment->id,
+            $textMap,
+            $sheetMap,
+            $studentViewEnabled,
+            $studentViewMinPenalty
+        );
+
+       $this->getDatabase()->log(
+            "Konfigurace kontrol byla nahrána (zadání ID={$assignment->id}, akce ID={$event->id}).",
+            LogType::SUBMIT,
+            userId: $this->loggedUser->id
         );
 
         $this->alertMessage('success', 'Konfigurace kontrol byla nahrána.');
-        $this->redirect('admin/students', ['event' => $event->id, 'action' => 'checks-config']);
+        $this->redirect('admin/students', [
+            'event' => $event->id,
+            'action' => 'checks-config',
+            'assignment' => $assignment->id,
+        ]);
     }
 
     /**
-     * Zpracuje ruční uložení konfigurace kontrol pro daný předmět.
+     * Zpracuje ruční uložení konfigurace kontrol pro konkrétní zadání.
      *
      * @param ScheduledEvent $event vypsaná akce
-     * @param Subject $subject předmět přiřazený k akci
+     * @param Assignment $assignment zadání, pro které se konfigurace ukládá
      * @param array $defaultTextMap výchozí mapa textových kontrol
      * @param array $defaultSheetMap výchozí mapa tabulkových kontrol
      * @return void
@@ -314,15 +317,19 @@ class StudentsController extends BaseAdminController
      */
     private function processChecksConfigSaveForm(
         ScheduledEvent $event,
-        Subject $subject,
+        Assignment $assignment,
         array $defaultTextMap,
         array $defaultSheetMap
     ): void {
         $textPost  = $_POST['text'] ?? [];
         $sheetPost = $_POST['spreadsheet'] ?? [];
 
-        if (!is_array($textPost))  $textPost = [];
-        if (!is_array($sheetPost)) $sheetPost = [];
+        if (!is_array($textPost)) {
+            $textPost = [];
+        }
+        if (!is_array($sheetPost)) {
+            $sheetPost = [];
+        }
 
         $textMap  = $defaultTextMap;
         $sheetMap = $defaultSheetMap;
@@ -330,50 +337,38 @@ class StudentsController extends BaseAdminController
         foreach ($textMap as $code => $_) {
             $textMap[$code] = isset($textPost[$code]) && (string)$textPost[$code] === '1';
         }
+
         foreach ($sheetMap as $code => $_) {
             $sheetMap[$code] = isset($sheetPost[$code]) && (string)$sheetPost[$code] === '1';
         }
 
-        $this->getDatabase()->saveChecksConfigForSubject($subject->id, $textMap, $sheetMap);
-         $this->getDatabase()->log(
-            "Konfigurace kontrol byla uložena (předmět ID={$subject->id}, akce ID={$event->id}).",
-            LogType::SUBMIT
-        );
-        $this->alertMessage('success', 'Konfigurace kontrol byla uložena.');
-        $this->redirect('admin/students', ['event' => $event->id, 'action' => 'checks-config']);
-    }
+        $studentViewEnabled = isset($_POST['student_view_enabled']) && (string)$_POST['student_view_enabled'] === '1';
 
-    /**
-     * Rozdělí zkratku předmětu na katedru a samotnou zkratku.
-     *
-     * @param string $shortcut zkratka předmětu
-     * @return array pole obsahující katedru a zkratku předmětu
-     * @author Adam Vaněček
-     */
-    private function splitSubjectShortcut(string $shortcut): array
-    {
-        $shortcut = trim($shortcut);
-        if (str_contains($shortcut, '/')) {
-            [$katedra, $zkratka] = array_map('trim', explode('/', $shortcut, 2));
-            return [$katedra, $zkratka];
+        $studentViewMinPenalty = -100;
+        if (isset($_POST['student_view_min_penalty']) && is_numeric($_POST['student_view_min_penalty'])) {
+            $studentViewMinPenalty = (int)$_POST['student_view_min_penalty'];
         }
-        return [$shortcut, $shortcut];
-    }
 
-    /**
-     * Převede interní označení semestru na formát používaný ve STAGu.
-     *
-     * @param string $sem označení semestru
-     * @return string semestr ve formátu STAG
-     * @author Adam Vaněček
-     */
-    private function semesterToStag(string $sem): string
-    {
-        $sem = strtoupper(trim($sem));
+        $this->getDatabase()->saveChecksConfigForAssignment(
+            $assignment->id,
+            $textMap,
+            $sheetMap,
+            $studentViewEnabled,
+            $studentViewMinPenalty
+        );
 
-        if ($sem === 'W') return 'ZS';
-        if ($sem === 'S') return 'LS';
-        return 'ZS';
+        $this->getDatabase()->log(
+            "Konfigurace kontrol byla uložena (zadání ID={$assignment->id}, akce ID={$event->id}).",
+            LogType::SUBMIT,
+            userId: $this->loggedUser->id
+        );
+
+        $this->alertMessage('success', 'Konfigurace kontrol byla uložena.');
+        $this->redirect('admin/students', [
+            'event' => $event->id,
+            'action' => 'checks-config',
+            'assignment' => $assignment->id,
+        ]);
     }
 
     /**
@@ -398,8 +393,8 @@ class StudentsController extends BaseAdminController
             $this->redirect('admin/students', ['event' => $event->id]);
             return;
         }
-
-        [$katedra, $zkratka] = $this->splitSubjectShortcut($subject->shortcut);
+        $stagExportManager = new StagExportManager();
+        [$katedra, $zkratka] = $stagExportManager->splitSubjectShortcut($subject->shortcut);
 
         $rawSemester = $subject->semester;
 
@@ -407,7 +402,7 @@ class StudentsController extends BaseAdminController
             $rawSemester = $rawSemester->value;
         }
 
-        $semestr = $this->semesterToStag((string)$rawSemester);
+        $semestr = $stagExportManager->semesterToStag((string)$rawSemester);
 
         $rok = (string)$subject->year;
 
@@ -818,165 +813,6 @@ class StudentsController extends BaseAdminController
     }
     
     /**
-     * Vrátí základní adresář pro soubory studenta a zadání.
-     *
-     * @param int $studentId ID studenta
-     * @param int $assignmentId ID zadání
-     * @return string cesta k základnímu adresáři
-     * @author Adam Vaněček
-     */
-    private function getBaseDir(int $studentId, int $assignmentId): string
-    {
-        return rtrim(DOCUMENT_FOLDER, '/') . '/' . $studentId . '/' . $assignmentId;
-    }
-
-    /**
-     * Načte informace o primárním odevzdání ze souboru.
-     *
-     * @param string $primaryPath cesta k souboru s primárním odevzdáním
-     * @return array|null data primárního odevzdání, nebo null pokud soubor neexistuje nebo je neplatný
-     * @author Adam Vaněček
-     */
-    private function readPrimary(string $primaryPath): ?array
-    {
-        if (!is_file($primaryPath)) return null;
-        $data = json_decode((string)file_get_contents($primaryPath), true);
-        return is_array($data) ? $data : null;
-    }
-    
-    /**
-     * Uloží informace o primárním odevzdání do souboru.
-     *
-     * @param string $baseDir základní adresář pro soubory
-     * @param string $primaryPath cesta k souboru s primárním odevzdáním
-     * @param mixed $upload objekt odevzdaného souboru
-     * @param int $seenLatestTime čas posledního známého odevzdání
-     * @param bool $manual určuje, zda bylo primární odevzdání nastaveno ručně
-     * @return void
-     * @author Adam Vaněček
-     */
-    private function writePrimary(string $baseDir, string $primaryPath, $upload, int $seenLatestTime, bool $manual = false): void
-    {
-        if (!is_dir($baseDir)) mkdir($baseDir, 0775, true);
-
-        $payload = [
-            'file_id'          => (int)$upload->id,
-            'filename'         => (string)$upload->filename,
-            'time'             => $this->timeToTs($upload->time),     
-            'manual'           => $manual,
-            'seen_latest_time' => $seenLatestTime,                    
-        ];
-
-        file_put_contents($primaryPath, json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-    }
-
-    /**
-     * Určí primární odevzdání ze seznamu nahraných souborů.
-     *
-     * @param array $uploads seznam odevzdaných souborů
-     * @param string $primaryPath cesta k souboru s primárním odevzdáním
-     * @return object|null objekt primárního odevzdání, nebo null pokud žádné neexistuje
-     * @author Adam Vaněček
-     */
-    private function resolvePrimaryUpload(array $uploads, string $primaryPath): ?object
-    {
-        if (empty($uploads)) return null;
-
-        $primary = $this->readPrimary($primaryPath);
-        if (!$primary) return $uploads[0];
-
-        $primaryId = (int)($primary['file_id'] ?? 0);
-        foreach ($uploads as $u) {
-            if ((int)$u->id === $primaryId) return $u;
-        }
-        return $uploads[0];
-    }
-
-    /**
-     * Převede časovou hodnotu na timestamp.
-     *
-     * @param mixed $time časová hodnota
-     * @return int čas ve formátu timestamp
-     * @author Adam Vaněček
-     */
-    private function timeToTs($time): int
-    {
-        if ($time instanceof \DateTimeInterface) return $time->getTimestamp();
-        if (is_numeric($time)) return (int)$time;
-        return 0;
-    }
-            
-
-    /**
-     * Najde checker report odpovídající konkrétnímu odevzdanému souboru.
-     *
-     * @param string $baseDir základní adresář pro soubory
-     * @param string $uploadFilename název odevzdaného souboru
-     * @param mixed $uploadTime čas odevzdání souboru
-     * @return string|null cesta k reportu, nebo null pokud nebyl nalezen
-     * @author Adam Vaněček
-     */
-    private function findReportForUpload(string $baseDir, string $uploadFilename, $uploadTime): ?string
-    {
-        $stem = pathinfo($uploadFilename, PATHINFO_FILENAME);
-        $ts = date('YmdHis', $this->timeToTs($uploadTime));
-
-        $pattern = $baseDir . '/*_odevzdani_' . $ts . '_*' . $stem . '.json';
-        $hits = glob($pattern) ?: [];
-        if ($hits) {
-            usort($hits, fn($a, $b) => filemtime($b) <=> filemtime($a));
-            return $hits[0];
-        }
-
-        $exact = $baseDir . '/' . $stem . '.json';
-        return is_file($exact) ? $exact : null;
-    }
-
-    /**
-     * Uloží nastavení ignorovaných checker chyb do reportu a přepočítá penalizaci.
-     *
-     * @param string $reportPath cesta k checker reportu
-     * @param array $ignorePost data z formuláře s ignorovanými chybami
-     * @return bool true, pokud se operace podařila, jinak false
-     * @author Adam Vaněček
-     */
-    private function applyCheckerIgnoresToReport(string $reportPath, array $ignorePost): bool
-    {
-        if (!$reportPath || !is_file($reportPath)) {
-            return false;
-        }
-
-        $data = json_decode((string)file_get_contents($reportPath), true);
-        if (!is_array($data) || !isset($data['entries']) || !is_array($data['entries'])) {
-            return false;
-        }
-
-        $ignore = $ignorePost['ignore'] ?? [];
-        if (!is_array($ignore)) $ignore = [];
-
-        foreach ($data['entries'] as &$entry) {
-            $code = $entry['code'] ?? null;
-            if (!$code) continue;
-            $entry['ignored'] = array_key_exists($code, $ignore);
-        }
-        unset($entry);
-
-        $total = 0;
-        foreach ($data['entries'] as $entry) {
-            $passed  = (bool)($entry['passed'] ?? false);
-            $ignored = (bool)($entry['ignored'] ?? false);
-            $points  = (int)($entry['points'] ?? 0);
-
-            if (!$passed && !$ignored) $total += $points;
-        }
-        if ($total < -100) $total = -100;
-        $data['total_penalty'] = $total;
-
-        file_put_contents($reportPath, json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        return true;
-    }
-
-    /**
      * Zpracuje odeslání formuláře pro ignorování checker chyb.
      *
      * @param string|null $reportPath cesta k checker reportu
@@ -987,6 +823,7 @@ class StudentsController extends BaseAdminController
      * @author Adam Vaněček
      */
     private function handleCheckerIgnoreSubmit(
+        CheckerReportManager $checkerManager,
         ?string $reportPath,
         ScheduledEvent $event,
         int $assignmentId,
@@ -995,7 +832,7 @@ class StudentsController extends BaseAdminController
         if (!$reportPath || !is_file($reportPath)) return;
         if (!isset($_POST['checker_ignore_form'])) return;
 
-        if ($this->applyCheckerIgnoresToReport($reportPath, $_POST)) {
+        if ($checkerManager->applyCheckerIgnoresToReport($reportPath, $_POST)) {
             $this->alertMessage('success', 'Nastavení ignorovaných chyb bylo uloženo.');
 
             $url = $this->createLink('admin/students', [
@@ -1008,112 +845,6 @@ class StudentsController extends BaseAdminController
             header('Location: ' . $url);
             exit;
         }
-    }
-
-    /**
-     * Načte checker report ze souboru.
-     *
-     * @param string|null $reportPath cesta k checker reportu
-     * @return array|null data checker reportu, nebo null pokud soubor neexistuje nebo je neplatný
-     * @author Adam Vaněček
-     */
-    private function loadCheckerReport(?string $reportPath): ?array
-    {
-        if (!$reportPath || !is_file($reportPath)) return null;
-
-        $data = json_decode((string) file_get_contents($reportPath), true);
-        return is_array($data) ? $data : null;
-    }
-
-    /**
-     * Zajistí, že primární odevzdání odpovídá nejnovějšímu dostupnému souboru.
-     *
-     * @param string $baseDir základní adresář pro soubory
-     * @param string $primaryPath cesta k souboru s primárním odevzdáním
-     * @param object|null $latestUpload nejnovější odevzdaný soubor
-     * @param int $latestTime čas nejnovějšího odevzdání
-     * @return void
-     * @author Adam Vaněček
-     */
-    private function ensurePrimaryIsFresh(string $baseDir, string $primaryPath, ?object $latestUpload, int $latestTime): void
-    {
-        if (!$latestUpload) {
-            return;
-        }
-
-        $cur = $this->readPrimary($primaryPath);
-
-        if ($cur === null) {
-            $this->writePrimary($baseDir, $primaryPath, $latestUpload, $latestTime, false);
-            return;
-        }
-
-        $seenLatest = (int)($cur['seen_latest_time'] ?? 0);
-
-        if ($latestTime > $seenLatest) {
-            $this->writePrimary($baseDir, $primaryPath, $latestUpload, $latestTime, false);
-        }
-    }
-
-    /**
-     * Vytvoří návrh komentáře na základě checker reportu.
-     *
-     * @param array|null $checkerReport data checker reportu
-     * @return string navržený komentář k hodnocení
-     * @author Adam Vaněček
-     */
-    private function buildSuggestedComment(?array $checkerReport): string
-    {
-        if (!is_array($checkerReport) || !isset($checkerReport['entries']) || !is_array($checkerReport['entries'])) {
-            return '';
-        }
-
-        $lines = [];
-        $lines[] = "Penalizace: " . ($checkerReport['total_penalty'] ?? 0);
-        $lines[] = "";
-
-        foreach ($checkerReport['entries'] as $e) {
-            $passed  = (bool)($e['passed'] ?? false);
-            $ignored = (bool)($e['ignored'] ?? false);
-            if ($passed || $ignored) continue;
-
-            $code   = (string)($e['code'] ?? '');
-            $name   = (string)($e['name'] ?? '');
-            $points = (int)($e['points'] ?? 0);
-            $msg    = trim((string)($e['message'] ?? ''));
-
-            $lines[] = "{$code} – {$name} ({$points})";
-            if ($msg !== '') $lines[] = $msg;
-            $lines[] = "";
-        }
-
-        return trim(implode("\n", $lines));
-    }
-
-    /**
-     * Sestaví přehled penalizací pro jednotlivá odevzdání.
-     *
-     * @param string $baseDir základní adresář pro soubory
-     * @param array $uploads seznam odevzdaných souborů
-     * @return array mapa penalizací podle ID odevzdání
-     * @author Adam Vaněček
-     */
-    private function buildUploadPenalties(string $baseDir, array $uploads): array
-    {
-        $penalties = [];
-
-        foreach ($uploads as $u) {
-            $reportPath = $this->findReportForUpload($baseDir, $u->filename, $u->time);
-
-            if ($reportPath && is_file($reportPath)) {
-                $data = json_decode((string) file_get_contents($reportPath), true);
-                $penalties[$u->id] = is_array($data) ? (int) ($data['total_penalty'] ?? 0) : null;
-            } else {
-                $penalties[$u->id] = null;
-            }
-        }
-
-        return $penalties;
     }
 
     /**
@@ -1159,17 +890,18 @@ class StudentsController extends BaseAdminController
         $this->templateData['files'] = $this->getDatabase()->getStudentAssignmentFiles($assignmentId, $id);
         
         // Author Adam Vaněček
+        $checkerManager = new CheckerReportManager();
         $files = $this->getDatabase()->getStudentAssignmentFiles($assignmentId, $id);
         $this->templateData['files'] = $files;
 
         $checkerReport = null;
 
         $uploads = array_values(array_filter($files, fn($f) => $f->filetype === FileType::UPLOAD));
-        usort($uploads, fn($a, $b) => $this->timeToTs($b->time) <=> $this->timeToTs($a->time));
+        usort($uploads, fn($a, $b) => $checkerManager->timeToTs($b->time) <=> $checkerManager->timeToTs($a->time));
         $latestUpload = $uploads[0] ?? null;
-        $latestTime = $latestUpload ? $this->timeToTs($latestUpload->time) : 0;
+        $latestTime = $latestUpload ? $checkerManager->timeToTs($latestUpload->time) : 0;
 
-        $baseDir = $this->getBaseDir($id, $assignmentId);
+        $baseDir = $checkerManager->getBaseDir($id, $assignmentId);
         $primaryPath = $baseDir . '/primary.json';
 
         $setPrimaryId = isset($_GET['setPrimary']) ? (int)$_GET['setPrimary'] : 0;
@@ -1180,7 +912,7 @@ class StudentsController extends BaseAdminController
             }
 
             if ($target) {
-                $this->writePrimary($baseDir, $primaryPath, $target, $latestTime, true);
+                $checkerManager->writePrimary($baseDir, $primaryPath, $target, $latestTime, true);
 
                 $url = $this->createLink('admin/students', [
                     'event' => $event->id,
@@ -1194,22 +926,22 @@ class StudentsController extends BaseAdminController
             }
         }
 
-        $this->ensurePrimaryIsFresh($baseDir, $primaryPath, $latestUpload, $latestTime);
+        $checkerManager->ensurePrimaryIsFresh($baseDir, $primaryPath, $latestUpload, $latestTime);
 
-        $primaryUpload = $this->resolvePrimaryUpload($uploads, $primaryPath);
+        $primaryUpload = $checkerManager->resolvePrimaryUpload($uploads, $primaryPath);
         $this->templateData['primaryUpload'] = $primaryUpload;
 
-        $this->templateData['uploadPenalties'] = $this->buildUploadPenalties($baseDir, $uploads);
+        $this->templateData['uploadPenalties'] = $checkerManager->buildUploadPenalties($baseDir, $uploads);
 
         if ($primaryUpload) {
-            $reportPath = $this->findReportForUpload($baseDir, $primaryUpload->filename, $primaryUpload->time);
+            $reportPath = $checkerManager->findReportForUpload($baseDir, $primaryUpload->filename, $primaryUpload->time);
 
-            $this->handleCheckerIgnoreSubmit($reportPath, $event, $assignmentId, $id);
+            $this->handleCheckerIgnoreSubmit($checkerManager,$reportPath, $event, $assignmentId, $id);
 
-            $checkerReport = $this->loadCheckerReport($reportPath);
+            $checkerReport = $checkerManager->loadCheckerReport($reportPath);
         }
 
-        $suggestedComment = $this->buildSuggestedComment($checkerReport);
+        $suggestedComment = $checkerManager->buildSuggestedComment($checkerReport);
         $this->templateData['suggestedComment'] = $suggestedComment;
 
         $this->templateData['suggestedComment'] = $suggestedComment;

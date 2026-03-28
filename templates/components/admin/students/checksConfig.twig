@@ -1,10 +1,10 @@
-<h1>Konfigurace kontrol</h1>
+<h1>Konfigurace kontrol – {{ assignment.name }}</h1>
 
-<form method="post" action="{{ createLink('admin/students', { action:'checks-config', event:event.id }) }}" enctype="multipart/form-data">
+<form method="post" action="{{ createLink('admin/students', { action:'checks-config', event:event.id, assignment: assignment.id }) }}" enctype="multipart/form-data">
     <div class="mb-3">
         <label for="file">Nahrát konfiguraci (.json)</label>
         <input id="file" class="form-control" type="file" name="file" required accept=".json,application/json">
-        <div class="form-text">Nahrajte JSON konfiguraci kontrol pro tento předmět/akci.</div>
+        <div class="form-text">Nahrajte JSON konfiguraci kontrol pro toto zadání.</div>
     </div>
 
     <div class="mb-3">
@@ -16,53 +16,84 @@
 
 <h2>Ruční výběr kontrol</h2>
 
-<form method="post" action="{{ createLink('admin/students', { action:'checks-config', event:event.id }) }}">
+<form method="post" action="{{ createLink('admin/students', { action:'checks-config', event:event.id, assignment: assignment.id }) }}">
     <div class="row">
-        <div class="col-md-6">
-            <h3>Text (Word/Writer)</h3>
-            <div class="border rounded p-2" style="max-height: 420px; overflow:auto;">
-                {% for c in textChecks %}
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox"
-                            id="t_{{ c.code }}"
-                            name="text[{{ c.code }}]"
-                            value="1"
-                            {% if c.enabled %}checked{% endif %}>
-                        <label class="form-check-label" for="t_{{ c.code }}">
-                            <strong>{{ c.code }}</strong>{% if c.title is defined %} — {{ c.title }}{% endif %}
-                        </label>
-                    </div>
-                {% endfor %}
+        {% if showTextChecks %}
+            <div class="col-md-6">
+                <h3>Text (Word/Writer)</h3>
+                <div class="border rounded p-2" style="max-height: 420px; overflow:auto;">
+                    {% for c in textChecks %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                id="t_{{ c.code }}"
+                                name="text[{{ c.code }}]"
+                                value="1"
+                                {% if c.enabled %}checked{% endif %}>
+                            <label class="form-check-label" for="t_{{ c.code }}">
+                                <strong>{{ c.code }}</strong>{% if c.title is defined %} — {{ c.title }}{% endif %}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
+        {% endif %}
 
+        {% if showSheetChecks %}
+            <div class="col-md-6">
+                <h3>Spreadsheet (Excel/Calc)</h3>
+                <div class="border rounded p-2" style="max-height: 420px; overflow:auto;">
+                    {% for c in sheetChecks %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                id="s_{{ c.code }}"
+                                name="spreadsheet[{{ c.code }}]"
+                                value="1"
+                                {% if c.enabled %}checked{% endif %}>
+                            <label class="form-check-label" for="s_{{ c.code }}">
+                                <strong>{{ c.code }}</strong>{% if c.title is defined %} — {{ c.title }}{% endif %}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <h2>Zobrazení výsledků studentovi</h2>
+
+    <div class="row mb-3">
         <div class="col-md-6">
-            <h3>Spreadsheet (Excel/Calc)</h3>
-            <div class="border rounded p-2" style="max-height: 420px; overflow:auto;">
-                {% for c in sheetChecks %}
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox"
-                            id="s_{{ c.code }}"
-                            name="spreadsheet[{{ c.code }}]"
-                            value="1"
-                            {% if c.enabled %}checked{% endif %}>
-                        <label class="form-check-label" for="s_{{ c.code }}">
-                            <strong>{{ c.code }}</strong>{% if c.title is defined %} — {{ c.title }}{% endif %}
-                        </label>
-                    </div>
-                {% endfor %}
+            <div class="form-check mb-3">
+                <input class="form-check-input"
+                    type="checkbox"
+                    id="student_view_enabled"
+                    name="student_view_enabled"
+                    value="1"
+                    {% if studentViewEnabled %}checked{% endif %}>
+                <label class="form-check-label" for="student_view_enabled">
+                    Povolit studentovi zobrazit výsledek automatické kontroly
+                </label>
+            </div>
+
+            <label for="student_view_min_penalty" class="form-label">
+                Zobrazit od penalizace
+            </label>
+            <input type="number"
+                class="form-control"
+                id="student_view_min_penalty"
+                name="student_view_min_penalty"
+                value="{{ studentViewMinPenalty }}">
+
+            <div class="form-text">
+                Např. 100 = zobrazit jen chyby se ztrátou 100 bodů, 50 = zobrazit chyby se ztrátou 50 a více bodů.
             </div>
         </div>
     </div>
 
     <div class="mt-3 d-flex gap-2 flex-wrap">
-        <button type="submit" class="btn btn-outline-primary" name="admin_checks_config_save">
-            Uložit výběr
-        </button>
-
-        <button type="submit" class="btn btn-outline-secondary" name="admin_checks_config_reset"
-                onclick="return confirm('Opravdu chcete obnovit výchozí konfiguraci?')">
-            Obnovit výchozí
-        </button>
+        <button type="submit" class="btn btn-outline-primary" name="admin_checks_config_save"> Uložit výběr </button>
+        <button type="submit" class="btn btn-outline-secondary" name="admin_checks_config_reset" onclick="return confirm('Opravdu chcete obnovit výchozí konfiguraci?')"> Obnovit výchozí </button>
     </div>
+
+
 </form>

@@ -1800,17 +1800,17 @@ class DatabaseManager
     }
 
     /**
-     * Načte uloženou konfiguraci kontrol pro daný předmět.
+     * Načte uloženou konfiguraci kontrol pro konkrétní zadání.
      *
-     * @param int $subjectId ID předmětu
+     * @param int $assignmentId ID zadání
      * @return array|null konfigurace kontrol, nebo null pokud neexistuje
      * @author Adam Vaněček
      */
-    public function getChecksConfigBySubjectId(int $subjectId): ?array
+    public function getChecksConfigByAssignmentId(int $assignmentId): ?array
     {
         $row = $this->queryOne(
-            "SELECT config_json FROM checks_config WHERE subject_id = ?",
-            [$subjectId]
+            "SELECT config_json FROM checks_config WHERE assignment_id = ?",
+            [$assignmentId]
         );
 
         if (!$row) return null;
@@ -1819,76 +1819,41 @@ class DatabaseManager
         return is_array($data) ? $data : null;
     }
 
-
     /**
-     * Uloží konfiguraci textových a tabulkových kontrol pro daný předmět.
+     * Uloží konfiguraci kontrol pro konkrétní zadání.
      *
-     * @param int $subjectId ID předmětu
-     * @param array $text konfigurace textových kontrol
-     * @param array $spreadsheet konfigurace tabulkových kontrol
-     * @return bool true, pokud se operace podařila, jinak false
+     * @param int $assignmentId ID zadání
+     * @param array $text mapa textových kontrol
+     * @param array $spreadsheet mapa tabulkových kontrol
+     * @param bool $studentViewEnabled určuje, zda student uvidí výsledek kontroly
+     * @param int $studentViewMinPenalty minimální hranice penalizace pro zobrazení
+     * @return bool true při úspěchu, jinak false
      * @author Adam Vaněček
      */
-    public function saveChecksConfigForSubject(int $subjectId, array $text, array $spreadsheet): bool
-    {
+    public function saveChecksConfigForAssignment(
+        int $assignmentId,
+        array $text,
+        array $spreadsheet,
+        bool $studentViewEnabled = false,
+        int $studentViewMinPenalty = -100
+    ): bool {
         $payload = json_encode([
             'text' => $text,
             'spreadsheet' => $spreadsheet,
+            'student_view' => [
+                'enabled' => $studentViewEnabled,
+                'min_penalty' => $studentViewMinPenalty,
+            ],
         ], JSON_UNESCAPED_UNICODE);
 
         $sql = "
-            INSERT INTO checks_config (subject_id, config_json)
+            INSERT INTO checks_config (assignment_id, config_json)
             VALUES (?, ?)
             ON DUPLICATE KEY UPDATE config_json = VALUES(config_json)
         ";
 
         $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([$subjectId, $payload]);
-    }
-
-    /**
-     * Načte definice kontrol daného typu z registry JSON souboru.
-     *
-     * @param string $type typ kontrol
-     * @return array seznam definic kontrol daného typu
-     * @author Adam Vaněček
-     */
-    public function getAllCheckDefinitions(string $type): array
-    {   
-        
-        // $registryPath = CHECKER_REGISTRY;
-        $registryPath = '/checker/checks/checks_config/checks_registry.json';
-
-        if (!is_file($registryPath)) {
-            return [];
-        }
-
-        $data = json_decode((string) file_get_contents($registryPath), true);
-        if (!is_array($data)) {
-            return [];
-        }
-
-        $items = $data[$type] ?? null;
-        if (!is_array($items)) {
-            return [];
-        }
-
-        $out = [];
-        foreach ($items as $row) {
-            if (!is_array($row)) continue;
-
-            $code = isset($row['code']) && is_string($row['code']) ? trim($row['code']) : '';
-            if ($code === '') continue;
-
-            $out[] = [
-                'code' => $code,
-                'title' => isset($row['title']) && is_string($row['title']) ? $row['title'] : '',
-                'default_enabled' => array_key_exists('default_enabled', $row) ? (bool)$row['default_enabled'] : true,
-                'order' => array_key_exists('order', $row) ? (int)$row['order'] : 0,
-            ];
-        }
-
-        return $out;
+        return $stmt->execute([$assignmentId, $payload]);
     }
 
     /**
@@ -1906,25 +1871,5 @@ class DatabaseManager
 
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
         return $row !== false ? $row : null;
-    }
-
-    /**
-     * Vrátí ID předmětu podle ID zadání.
-     *
-     * @param int $assignmentId ID zadání
-     * @return int|null ID předmětu, nebo null pokud nebyl nalezen
-     * @author Adam Vaněček
-     */
-    public function getSubjectIdByAssignmentId(int $assignmentId): ?int
-    {
-        $row = $this->queryOne(
-            "SELECT se.subject_id
-            FROM assignments a
-            JOIN scheduled_events se ON se.id = a.scheduled_event_id
-            WHERE a.id = ?",
-            [$assignmentId]
-        );
-
-        return $row ? (int)$row['subject_id'] : null;
     }
 }

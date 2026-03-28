@@ -11,6 +11,8 @@ use App\Model\Database\Types\FileType;
 use App\Model\Database\Types\LogType;
 use App\Model\Database\Types\Options;
 use App\Model\Session;
+use App\Model\CheckerReportManager;
+use App\Model\ChecksConfigManager;
 use DateTime;
 
 /**
@@ -19,7 +21,7 @@ use DateTime;
  * @author Michal Turek
  */
 class AssignmentsController extends Controller
-{
+{  
     protected function process(): void
     {
         $studentId = $this->getSession()->get(Session::STUDENT);
@@ -40,8 +42,8 @@ class AssignmentsController extends Controller
         }
 
         $this->templateData['loggedStudent'] = $student;
-
         $this->templateData['now'] = $now = new DateTime();
+
         // Pokud je v URL dostupné ID, dojde k zobrazení detailu vybraného zadání
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $id = (int) $_GET['id'];
@@ -52,6 +54,9 @@ class AssignmentsController extends Controller
                 $this->error404();
                 return;
             }
+
+            $action = $_GET['action'] ?? 'detail';
+            $showValidatorReportSection = ($action === 'validator-report');
 
             if ($assignment->dateTo >= $now && isset($_POST['submit_attachment_form'], $_FILES['attachment'])) {
                 $this->processSubmitAttachmentForm($assignment, $student);
@@ -72,6 +77,7 @@ class AssignmentsController extends Controller
             $this->templateData['assignment'] = $assignment;
             $this->templateData['details'] = $details;
             $files = $this->getDatabase()->getStudentAssignmentFiles($id, $studentId, true);
+            $allFiles = $this->getDatabase()->getStudentAssignmentFiles($id, $studentId) ?? [];
             foreach ($files as $file) {
                 if ($file->filetype === FileType::ASSIGNMENT_TXT) {
                     $this->templateData['assignmentText'] = file_get_contents(DOCUMENT_FOLDER . '/' . $file->studentId . '/' . $file->assignmentId . '/' . $file->location);
@@ -79,6 +85,36 @@ class AssignmentsController extends Controller
                 }
             }
             $this->templateData['files'] = $files;
+
+            $dbCfg = $this->getDatabase()->getChecksConfigByAssignmentId($assignment->id) ?? [];
+            $studentViewCfg = is_array($dbCfg['student_view'] ?? null) ? $dbCfg['student_view'] : [];
+            $canShowValidatorReport = (bool)($studentViewCfg['enabled'] ?? false);
+            $studentViewMinPenalty = abs((int)($studentViewCfg['min_penalty'] ?? 100));
+            
+            $checkerReport = null;
+            $checkerManager = new CheckerReportManager();
+
+            $baseDir = $checkerManager->getBaseDir($student->id, $assignment->id);
+
+            $uploads = array_values(array_filter($allFiles, fn($f) => $f->filetype === FileType::UPLOAD));
+            usort($uploads, fn($a, $b) => $checkerManager->timeToTs($b->time) <=> $checkerManager->timeToTs($a->time));
+
+            $latestUpload = $uploads[0] ?? null;
+
+            if ($latestUpload) {
+                $reportPath = $checkerManager->findReportForUpload(
+                    $baseDir,
+                    $latestUpload->filename,
+                    $latestUpload->time
+                );
+
+                $checkerReport = $checkerManager->loadCheckerReport($reportPath);
+            }
+
+            $this->templateData['canShowValidatorReport'] = $canShowValidatorReport;
+            $this->templateData['showValidatorReportSection'] = $showValidatorReportSection;
+            $this->templateData['checkerReport'] = $checkerReport;
+            $this->templateData['studentViewMinPenalty'] = $studentViewMinPenalty;
             $this->templateData['attempts'] = $this->getDatabase()->countStudentAttempts($id, $studentId);
         } else {
             // výchozí akce výpisu všech zadání
@@ -86,26 +122,7 @@ class AssignmentsController extends Controller
         }
     }
 
-    // FORMULÁŘE
-    private function sanitizeEnabledMap($raw, array $defaultMap): array
-    {
-        $out = $defaultMap;
-
-        if (!is_array($raw)) {
-            return $out;
-        }
-
-        foreach ($raw as $k => $v) {
-            if (!is_string($k) || !is_bool($v)) continue;
-            $k = trim($k);
-            if ($k === '') continue;
-            if (!array_key_exists($k, $out)) continue;
-            $out[$k] = $v;
-        }
-
-        return $out;
-    }
-    
+    // FORMULÁŘE    
     /**
      * Metoda slouží pro zpracování formuláře na odevzdání souboru s vypracováním.
      *
@@ -137,24 +154,17 @@ class AssignmentsController extends Controller
             if (!is_writable($studentDir)) {
                 throw new \RuntimeException("Složka není zapisovatelná: {$studentDir}");
             }
-
+            $configManager = new ChecksConfigManager();
             $logFile = $studentDir . '/automaticka_kontrola.log';
+            
+            $dbCfg = $this->getDatabase()->getChecksConfigByAssignmentId($assignment->id) ?? [];
+            $defsText = $configManager->getAllCheckDefinitions('text');
+            $defsSheet = $configManager->getAllCheckDefinitions('spreadsheet');
+            $defaultTextMap = $configManager->buildDefaultMap($defsText);
+            $defaultSheetMap = $configManager->buildDefaultMap($defsSheet);
 
-            $subjectId = $this->getDatabase()->getSubjectIdByAssignmentId($assignment->id);
-
-            $dbCfg = $subjectId ? ($this->getDatabase()->getChecksConfigBySubjectId($subjectId) ?? []) : [];
-
-            $defsText  = $this->getDatabase()->getAllCheckDefinitions('text');
-            $defsSheet = $this->getDatabase()->getAllCheckDefinitions('spreadsheet');
-
-            $defaultTextMap = [];
-            foreach ($defsText as $d) $defaultTextMap[$d['code']] = true;
-
-            $defaultSheetMap = [];
-            foreach ($defsSheet as $d) $defaultSheetMap[$d['code']] = true;
-
-            $textMap  = $this->sanitizeEnabledMap($dbCfg['text'] ?? null, $defaultTextMap);
-            $sheetMap = $this->sanitizeEnabledMap($dbCfg['spreadsheet'] ?? null, $defaultSheetMap);
+            $textMap = $configManager->sanitizeEnabledMap($dbCfg['text'] ?? null, $defaultTextMap);
+            $sheetMap = $configManager->sanitizeEnabledMap($dbCfg['spreadsheet'] ?? null, $defaultSheetMap);
 
             $configPath = $studentDir . '/checks_config.json';
 

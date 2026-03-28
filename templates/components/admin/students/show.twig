@@ -28,9 +28,7 @@
                                 <td>
                                     <a class="btn btn-sm btn-outline-primary" href="{{ createLink('admin/students', { action: 'download', event: event.id, id: student.id, assignment: assignment.id, file: file.id }) }}">Stáhnout</a>
                                     {% if isPrimary %}
-                                      <button type="button" class="btn btn-sm btn-warning" disabled>
-                                        Hlavní
-                                      </button>
+                                      <button type="button" class="btn btn-sm btn-warning" disabled> Hlavní </button>
                                     {% else %}
                                       <a class="btn btn-sm btn-outline-secondary"
                                         href="{{ createLink('admin/students', { event: event.id, action: 'show', assignment: assignment.id, id: student.id, setPrimary: file.id }) }}">
@@ -101,7 +99,6 @@
 {% if checkerReport %}
   <h2 id="auto-check" class="mb-2">Automatická kontrola</h2>
 
-  {# Vyfiltrujeme chyby a rovnou je seřadíme od největší penalizace (nejmenší body) #}
   {% set failedAll = checkerReport.entries|filter(e => e.passed == false)|sort((a, b) => a.points <=> b.points) %}
   {% set ignoredCount = checkerReport.entries|filter(e => (e.ignored ?? false) == true)|length %}
 
@@ -116,7 +113,6 @@
       </div>
 
       <div class="ms-auto d-flex align-items-center gap-2">
-        {# Nový select pro řazení #}
         <select id="errorSortSelect" class="form-select form-select-sm w-auto" onchange="sortCheckerErrors()">
           <option value="penalty">Od největší penalizace</option>
           <option value="category">Podle skupiny (kategorie)</option>
@@ -129,12 +125,10 @@
     {% if failedAll|length == 0 %}
       <div class="alert alert-success py-2 mb-3">Všechny kontroly prošly.</div>
     {% else %}
-      {# Přidáno id="checker-errors-container" pro manipulaci v JS #}
       <div id="checker-errors-container" class="border rounded p-2 bg-light" style="height:360px; overflow:auto; resize:vertical; min-height:200px;">
         {% for e in failedAll %}
           {% set isIgnored = (e.ignored ?? false) %}
 
-          {# Přidána třída "checker-error-item" a data atributy pro body a kategorii #}
           <div class="checker-error-item bg-white border rounded p-2 mb-2 {{ isIgnored ? 'opacity-50' : '' }}"
             data-points="{{ e.points }}"
             data-category="{{ e.category|escape('html_attr') }}">
@@ -188,12 +182,10 @@
 
           items.sort((a, b) => {
               if (sortBy === 'penalty') {
-                  // Od největší penalizace (což jsou nejnižší čísla: -100 je menší než -5)
                   const pA = parseInt(a.getAttribute('data-points'), 10) || 0;
                   const pB = parseInt(b.getAttribute('data-points'), 10) || 0;
                   return pA - pB; 
               } else if (sortBy === 'category') {
-                  // Abecedně podle kategorie
                   const cA = a.getAttribute('data-category') || '';
                   const cB = b.getAttribute('data-category') || '';
                   return cA.localeCompare(cB, 'cs'); // 'cs' zajistí správné české řazení (např. Ch, háčky)
@@ -201,7 +193,6 @@
               return 0;
           });
 
-          // Přeskládání položek v DOMu (přidáním se existující element jen přesune na konec)
           items.forEach(item => container.appendChild(item));
       }
       </script>
