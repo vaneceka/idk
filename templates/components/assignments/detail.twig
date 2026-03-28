@@ -110,7 +110,7 @@
                                         </div>
                                     {% endif %}
                                 {% else %}
-                                    <div class="alert alert-warning">
+                                    <div class="alert alert-warning" id="validatorReportWaiting">
                                         Výsledek automatické kontroly zatím není dostupný.
                                     </div>
                                 {% endif %}
@@ -149,3 +149,38 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const shouldPoll = {{ canShowValidatorReport and not checkerReport ? 'true' : 'false' }};
+    const wrapper = document.getElementById('validatorReportWrapper');
+
+    if (!shouldPoll || !wrapper) return;
+
+    let tries = 0;
+
+    const poll = async () => {
+        if (++tries > 10) return;
+
+        try {
+            const url = new URL(window.location.href);
+            url.searchParams.set('_ts', Date.now().toString());
+
+            const html = await fetch(url).then(r => r.text());
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const fresh = doc.getElementById('validatorReportWrapper');
+
+            if (fresh) {
+                wrapper.innerHTML = fresh.innerHTML;
+                if (!wrapper.querySelector('#validatorReportWaiting')) return;
+            }
+        } catch (e) {
+            console.error(e);
+        }
+
+        setTimeout(poll, 2000);
+    };
+
+    setTimeout(poll, 2000);
+});
+</script>

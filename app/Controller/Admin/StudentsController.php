@@ -943,8 +943,6 @@ class StudentsController extends BaseAdminController
 
         $suggestedComment = $checkerManager->buildSuggestedComment($checkerReport);
         $this->templateData['suggestedComment'] = $suggestedComment;
-
-        $this->templateData['suggestedComment'] = $suggestedComment;
         $this->templateData['checkerReport'] = $checkerReport;
         // Author Adam Vaněček
     }

@@ -80,7 +80,8 @@ class AssignmentsController extends Controller
             $allFiles = $this->getDatabase()->getStudentAssignmentFiles($id, $studentId) ?? [];
             foreach ($files as $file) {
                 if ($file->filetype === FileType::ASSIGNMENT_TXT) {
-                    $this->templateData['assignmentText'] = file_get_contents(DOCUMENT_FOLDER . '/' . $file->studentId . '/' . $file->assignmentId . '/' . $file->location);
+                    $content = file_get_contents(DOCUMENT_FOLDER . '/' . $file->studentId . '/' . $file->assignmentId . '/' . $file->location);
+                    $this->templateData['assignmentText'] = $content !== false ? $content : '';
                     break;
                 }
             }
