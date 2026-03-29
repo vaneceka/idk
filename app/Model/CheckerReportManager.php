@@ -17,7 +17,6 @@ class CheckerReportManager
      * @param int $studentId ID studenta
      * @param int $assignmentId ID zadání
      * @return string cesta k základnímu adresáři
-     * @author Adam Vaněček
      */
     public function getBaseDir(int $studentId, int $assignmentId): string
     {
@@ -29,7 +28,6 @@ class CheckerReportManager
      *
      * @param string $primaryPath cesta k souboru s primárním odevzdáním
      * @return array|null data primárního odevzdání, nebo null pokud soubor neexistuje nebo je neplatný
-     * @author Adam Vaněček
      */
     public function readPrimary(string $primaryPath): ?array
     {
@@ -50,7 +48,6 @@ class CheckerReportManager
      * @param int $seenLatestTime čas posledního známého odevzdání
      * @param bool $manual určuje, zda bylo primární odevzdání nastaveno ručně
      * @return void
-     * @author Adam Vaněček
      */
     public function writePrimary(string $baseDir, string $primaryPath, $upload, int $seenLatestTime, bool $manual = false): void
     {
@@ -75,7 +72,6 @@ class CheckerReportManager
      * @param array $uploads seznam odevzdaných souborů
      * @param string $primaryPath cesta k souboru s primárním odevzdáním
      * @return object|null objekt primárního odevzdání, nebo null pokud žádné neexistuje
-     * @author Adam Vaněček
      */
     public function resolvePrimaryUpload(array $uploads, string $primaryPath): ?object
     {
@@ -103,7 +99,6 @@ class CheckerReportManager
      *
      * @param mixed $time časová hodnota
      * @return int čas ve formátu timestamp
-     * @author Adam Vaněček
      */
     public function timeToTs($time): int
     {
@@ -125,7 +120,6 @@ class CheckerReportManager
      * @param string $uploadFilename název odevzdaného souboru
      * @param mixed $uploadTime čas odevzdání souboru
      * @return string|null cesta k reportu, nebo null pokud nebyl nalezen
-     * @author Adam Vaněček
      */
     public function findReportForUpload(string $baseDir, string $uploadFilename, $uploadTime): ?string
     {
@@ -149,7 +143,6 @@ class CheckerReportManager
      *
      * @param string|null $reportPath cesta k checker reportu
      * @return array|null data checker reportu, nebo null pokud soubor neexistuje nebo je neplatný
-     * @author Adam Vaněček
      */
     public function loadCheckerReport(?string $reportPath): ?array
     {
@@ -169,7 +162,6 @@ class CheckerReportManager
      * @param object|null $latestUpload nejnovější odevzdaný soubor
      * @param int $latestTime čas nejnovějšího odevzdání
      * @return void
-     * @author Adam Vaněček
      */
     public function ensurePrimaryIsFresh(string $baseDir, string $primaryPath, ?object $latestUpload, int $latestTime): void
     {
@@ -196,7 +188,6 @@ class CheckerReportManager
      *
      * @param array|null $checkerReport data checker reportu
      * @return string navržený komentář k hodnocení
-     * @author Adam Vaněček
      */
     public function buildSuggestedComment(?array $checkerReport): string
     {
@@ -236,7 +227,6 @@ class CheckerReportManager
      * @param string $baseDir základní adresář pro soubory
      * @param array $uploads seznam odevzdaných souborů
      * @return array mapa penalizací podle ID odevzdání
-     * @author Adam Vaněček
      */
     public function buildUploadPenalties(string $baseDir, array $uploads): array
     {
@@ -262,7 +252,6 @@ class CheckerReportManager
      * @param string $reportPath cesta k checker reportu
      * @param array $ignorePost data z formuláře s ignorovanými chybami
      * @return bool true, pokud se operace podařila, jinak false
-     * @author Adam Vaněček
      */
     public function applyCheckerIgnoresToReport(string $reportPath, array $ignorePost): bool
     {

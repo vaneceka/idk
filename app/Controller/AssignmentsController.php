@@ -85,39 +85,25 @@ class AssignmentsController extends Controller
                     break;
                 }
             }
-            // Author Adam Vaněček
+            $automaticCheckManager = new AutomaticCheckManager($this->getDatabase());
+
+            $this->templateData['assignment'] = $assignment;
+            $this->templateData['details'] = $details;
+
+            $files = $automaticCheckManager->getStudentFiles($id, $studentId);
+            $this->templateData['assignmentText'] = $automaticCheckManager->loadAssignmentText($id, $studentId);
             $this->templateData['files'] = $files;
 
-            $dbCfg = $this->getDatabase()->getChecksConfigByAssignmentId($assignment->id) ?? [];
-            $studentViewCfg = is_array($dbCfg['student_view'] ?? null) ? $dbCfg['student_view'] : [];
-            $canShowValidatorReport = (bool)($studentViewCfg['enabled'] ?? false);
-            $studentViewMinPenalty = abs((int)($studentViewCfg['min_penalty'] ?? 100));
-            
-            $checkerReport = null;
-            $checkerManager = new CheckerReportManager();
+            $reportData = $automaticCheckManager->buildStudentReportData(
+                $assignment,
+                $student,
+                $showValidatorReportSection
+            );
 
-            $baseDir = $checkerManager->getBaseDir($student->id, $assignment->id);
-
-            $uploads = array_values(array_filter($allFiles, fn($f) => $f->filetype === FileType::UPLOAD));
-            usort($uploads, fn($a, $b) => $checkerManager->timeToTs($b->time) <=> $checkerManager->timeToTs($a->time));
-
-            $latestUpload = $uploads[0] ?? null;
-
-            if ($latestUpload) {
-                $reportPath = $checkerManager->findReportForUpload(
-                    $baseDir,
-                    $latestUpload->filename,
-                    $latestUpload->time
-                );
-
-                $checkerReport = $checkerManager->loadCheckerReport($reportPath);
-            }
-
-            $this->templateData['canShowValidatorReport'] = $canShowValidatorReport;
-            $this->templateData['showValidatorReportSection'] = $showValidatorReportSection;
-            $this->templateData['checkerReport'] = $checkerReport;
-            $this->templateData['studentViewMinPenalty'] = $studentViewMinPenalty;
-            // Author Adam Vaněček
+            $this->templateData['canShowValidatorReport'] = $reportData['canShowValidatorReport'];
+            $this->templateData['showValidatorReportSection'] = $reportData['showValidatorReportSection'];
+            $this->templateData['checkerReport'] = $reportData['checkerReport'];
+            $this->templateData['studentViewMinPenalty'] = $reportData['studentViewMinPenalty'];
             $this->templateData['attempts'] = $this->getDatabase()->countStudentAttempts($id, $studentId);
         } else {
             // výchozí akce výpisu všech zadání
@@ -146,92 +132,16 @@ class AssignmentsController extends Controller
         }
         // Author Adam Vaněček
         try {
-            $studentDir = DOCUMENT_FOLDER . '/' . $student->id . '/' . $assignment->id;
-
-            if (!is_dir($studentDir)) {
-                if (!mkdir($studentDir, 0775, true) && !is_dir($studentDir)) {
-                    throw new \RuntimeException("Nelze vytvořit složku: {$studentDir}");
-                }
-            }
-            
-            if (!is_writable($studentDir)) {
-                throw new \RuntimeException("Složka není zapisovatelná: {$studentDir}");
-            }
-            $configManager = new ChecksConfigManager();
-            $logFile = $studentDir . '/automaticka_kontrola.log';
-
-            $logJustCreated = false;
-
-            if (!is_file($logFile)) {
-                if (@touch($logFile) === false) {
-                    throw new \RuntimeException("Nelze vytvořit log soubor: {$logFile}");
-                }
-
-                $logJustCreated = true;
-            }
-            
-            $dbCfg = $this->getDatabase()->getChecksConfigByAssignmentId($assignment->id) ?? [];
-            $defsText = $configManager->getAllCheckDefinitions('text');
-            $defsSheet = $configManager->getAllCheckDefinitions('spreadsheet');
-            $defaultTextMap = $configManager->buildDefaultMap($defsText);
-            $defaultSheetMap = $configManager->buildDefaultMap($defsSheet);
-
-            $textMap = $configManager->sanitizeEnabledMap($dbCfg['text'] ?? null, $defaultTextMap);
-            $sheetMap = $configManager->sanitizeEnabledMap($dbCfg['spreadsheet'] ?? null, $defaultSheetMap);
-
-            $configPath = $studentDir . '/checks_config.json';
-
-            $json = json_encode(
-                ['text' => $textMap, 'spreadsheet' => $sheetMap],
-                JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT
-            );
-
-            if ($json === false) {
-                throw new \RuntimeException("Nelze serializovat checks config do JSON.");
-            }
-
-            $w = file_put_contents($configPath, $json);
-            if ($w === false) {
-                $err = error_get_last();
-                throw new \RuntimeException("Nelze zapsat configPath: {$configPath}. " . ($err['message'] ?? ''));
-            }
-
-            if ($logJustCreated) {
-                $result = $this->getDatabase()->addAssignmentFile(
-                    $assignment->id,
-                    $student->id,
-                    'automaticka_kontrola.log',
-                    FileType::CHECKER_LOG,
-                    'automaticka_kontrola.log'
-                );
-
-                if ($result === false) {
-                    throw new \RuntimeException('Nepodařilo se uložit checker log do databáze.');
-                }
-            }
-
-            if (!defined('CHECKER_WORKDIR')) {
-                define('CHECKER_WORKDIR', '/checker');
-            }
-
-            $runner = CHECKER_WORKDIR . '/bin/run_checker.sh';
-            $cmd = 'cd ' . escapeshellarg(CHECKER_WORKDIR) . ' && ' .
-                escapeshellcmd($runner) .
-                ' --student-dir ' . escapeshellarg($studentDir) .
-                ' --out-dir ' . escapeshellarg($studentDir) .
-                ' --output ' . escapeshellarg('json') .
-                ' --checks-config ' . escapeshellarg($configPath) .
-                ' >> ' . escapeshellarg($logFile) . ' 2>&1 &';
-            exec($cmd);
+            $automaticCheckManager = new AutomaticCheckManager($this->getDatabase());
+            $automaticCheckManager->enqueueCheck($assignment, $student);
 
             $this->getDatabase()->log(
                 "Automatická kontrola byla zařazena do fronty (zadání ID={$assignment->id}).",
                 LogType::SUBMIT,
                 studentId: $student->id
             );
-
         } catch (\Throwable $e) {
-             $this->getDatabase()->log(
+            $this->getDatabase()->log(
                 "CHYBA automatické kontroly (zadání ID={$assignment->id}): " . $e->getMessage(),
                 LogType::SUBMIT,
                 studentId: $student->id

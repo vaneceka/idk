@@ -17,6 +17,7 @@ use App\Model\Database\Types\FileType;
 use App\Model\CheckerReportManager;
 use App\Model\ChecksConfigManager;
 use App\Model\StagExportManager;
+use App\Model\AdminCheckerReviewManager;
 use DateTime;
 
 /**
@@ -151,19 +152,14 @@ class StudentsController extends BaseAdminController
 
         $textDefs = $configManager->getAllCheckDefinitions('text');
         $sheetDefs = $configManager->getAllCheckDefinitions('spreadsheet');
+        $dbCfg = $this->getDatabase()->getChecksConfigByAssignmentId($assignment->id);
 
-        $defaultTextMap = $configManager->buildDefaultMap($textDefs);
-        $defaultSheetMap = $configManager->buildDefaultMap($sheetDefs);
+        $viewData = $configManager->buildChecksConfigViewData($textDefs, $sheetDefs, $dbCfg);
 
-        $dbCfg = $this->getDatabase()->getChecksConfigByAssignmentId($assignment->id) ?? [];
-
-        $textMap = $configManager->sanitizeEnabledMap($dbCfg['text'] ?? null, $defaultTextMap);
-        $sheetMap = $configManager->sanitizeEnabledMap($dbCfg['spreadsheet'] ?? null, $defaultSheetMap);
-
-        $studentViewCfg = is_array($dbCfg['student_view'] ?? null) ? $dbCfg['student_view'] : [];
-
-        $studentViewEnabled = (bool)($studentViewCfg['enabled'] ?? false);
-        $studentViewMinPenalty = abs((int)($studentViewCfg['min_penalty'] ?? 100));
+        $defaultTextMap = $viewData['defaultTextMap'];
+        $defaultSheetMap = $viewData['defaultSheetMap'];
+        $studentViewEnabled = $viewData['studentViewEnabled'];
+        $studentViewMinPenalty = $viewData['studentViewMinPenalty'];
 
         if (isset($_POST['admin_checks_config_upload'])) {
             $this->processChecksConfigUploadForm($event, $assignment, $defaultTextMap, $defaultSheetMap);
@@ -197,28 +193,8 @@ class StudentsController extends BaseAdminController
             return;
         }
 
-        $textChecks = [];
-        foreach ($textDefs as $d) {
-            $code = $d['code'];
-            $textChecks[] = [
-                'code' => $code,
-                'title' => $d['title'] ?? '',
-                'enabled' => (bool)($textMap[$code] ?? false),
-            ];
-        }
-
-        $sheetChecks = [];
-        foreach ($sheetDefs as $d) {
-            $code = $d['code'];
-            $sheetChecks[] = [
-                'code' => $code,
-                'title' => $d['title'] ?? '',
-                'enabled' => (bool)($sheetMap[$code] ?? false),
-            ];
-        }
-
-        $this->templateData['textChecks'] = $textChecks;
-        $this->templateData['sheetChecks'] = $sheetChecks;
+        $this->templateData['textChecks'] = $viewData['textChecks'];
+        $this->templateData['sheetChecks'] = $viewData['sheetChecks'];
         $this->templateData['assignment'] = $assignment;
         $this->templateData['profile'] = $profile;
         $this->templateData['showTextChecks'] = $showTextChecks;
@@ -263,32 +239,20 @@ class StudentsController extends BaseAdminController
         }
         
         $configManager = new ChecksConfigManager();
-        $textRaw = $configManager->assertConfigSectionIsMap($data['text']);
-        $sheetRaw = $configManager->assertConfigSectionIsMap($data['spreadsheet']);
 
-        if ($textRaw === null || $sheetRaw === null) {
-            $this->alertMessage('danger', 'JSON musí mít formát mapy: "text": { "T_...": true/false } a "spreadsheet": { "S_...": true/false }.');
+        try {
+            $parsed = $configManager->parseUploadedConfig($data, $defaultTextMap, $defaultSheetMap);
+        } catch (\InvalidArgumentException $e) {
+            $this->alertMessage('danger', $e->getMessage());
             return;
-        }
-
-        $textMap = $configManager->sanitizeEnabledMap($textRaw, $defaultTextMap);
-        $sheetMap = $configManager->sanitizeEnabledMap($sheetRaw, $defaultSheetMap);
-
-        $studentViewRaw = is_array($data['student_view'] ?? null) ? $data['student_view'] : [];
-
-        $studentViewEnabled = (bool)($studentViewRaw['enabled'] ?? false);
-
-        $studentViewMinPenalty = -100;
-        if (isset($studentViewRaw['min_penalty']) && is_numeric($studentViewRaw['min_penalty'])) {
-            $studentViewMinPenalty = (int)$studentViewRaw['min_penalty'];
         }
 
         $this->getDatabase()->saveChecksConfigForAssignment(
             $assignment->id,
-            $textMap,
-            $sheetMap,
-            $studentViewEnabled,
-            $studentViewMinPenalty
+            $parsed['text'],
+            $parsed['spreadsheet'],
+            $parsed['student_view_enabled'],
+            $parsed['student_view_min_penalty']
         );
 
        $this->getDatabase()->log(
@@ -321,40 +285,15 @@ class StudentsController extends BaseAdminController
         array $defaultTextMap,
         array $defaultSheetMap
     ): void {
-        $textPost  = $_POST['text'] ?? [];
-        $sheetPost = $_POST['spreadsheet'] ?? [];
-
-        if (!is_array($textPost)) {
-            $textPost = [];
-        }
-        if (!is_array($sheetPost)) {
-            $sheetPost = [];
-        }
-
-        $textMap  = $defaultTextMap;
-        $sheetMap = $defaultSheetMap;
-
-        foreach ($textMap as $code => $_) {
-            $textMap[$code] = isset($textPost[$code]) && (string)$textPost[$code] === '1';
-        }
-
-        foreach ($sheetMap as $code => $_) {
-            $sheetMap[$code] = isset($sheetPost[$code]) && (string)$sheetPost[$code] === '1';
-        }
-
-        $studentViewEnabled = isset($_POST['student_view_enabled']) && (string)$_POST['student_view_enabled'] === '1';
-
-        $studentViewMinPenalty = -100;
-        if (isset($_POST['student_view_min_penalty']) && is_numeric($_POST['student_view_min_penalty'])) {
-            $studentViewMinPenalty = (int)$_POST['student_view_min_penalty'];
-        }
+        $configManager = new ChecksConfigManager();
+        $parsed = $configManager->parsePostedConfig($_POST, $defaultTextMap, $defaultSheetMap);
 
         $this->getDatabase()->saveChecksConfigForAssignment(
             $assignment->id,
-            $textMap,
-            $sheetMap,
-            $studentViewEnabled,
-            $studentViewMinPenalty
+            $parsed['text'],
+            $parsed['spreadsheet'],
+            $parsed['student_view_enabled'],
+            $parsed['student_view_min_penalty']
         );
 
         $this->getDatabase()->log(
@@ -416,56 +355,24 @@ class StudentsController extends BaseAdminController
 
         $out = fopen('php://output', 'w');
 
-        $header = [
-            'katedra',
-            'zkratka',
-            'rok',
-            'semestr',
-            'os_cislo',
-            'jmeno',
-            'prijmeni',
-            'titul',
-            'nesplnene_prerekvizity',
-            'zk_typ_hodnoceni',
-            'zk_hodnoceni',
-            'zk_body',
-            'zk_datum',
-            'zk_pokus',
-            'zk_ucit_idno',
-            'zk_jazyk',
-            'zk_ucit_jmeno',
-        ];
-        fputcsv($out, $header, ';');
+        fputcsv($out, $stagExportManager->getSubmittedExportHeader(), ';');
 
         foreach ($students as $s) {
             $state = $this->getDatabase()->getOverallStateForStudentOnEvent($event->id, (int)$s['id']);
 
-            $zk_hodnoceni = '';
-            if ($state === AssignmentState::ACCEPTED) $zk_hodnoceni = 'S';
-            elseif ($state === AssignmentState::REJECTED) $zk_hodnoceni = 'N';
-            
+            $zkHodnoceni = $stagExportManager->stateToStagGrade($state);
             $lastUpload = $this->getDatabase()->getLatestUploadTimeForStudentOnEvent($event->id, (int)$s['id']);
-            $zk_datum = $lastUpload ? $lastUpload->format('d.m.Y') : '';
+            $zkDatum = $lastUpload ? $lastUpload->format('d.m.Y') : '';
 
-            $row = [
+            $row = $stagExportManager->buildSubmittedExportRow(
+                $s,
                 $katedra,
                 $zkratka,
                 $rok,
                 $semestr,
-                (string)$s['student_number'], 
-                (string)$s['name'],
-                (string)$s['surname'],
-                '', // titul 
-                '', // nesplnene_prerekvizity
-                '', // zk_typ_hodnoceni 
-                $zk_hodnoceni, 
-                '', // zk_body 
-                $zk_datum, // zk_datum 
-                '1', // zk_pokus
-                '', // zk_ucit_idno
-                '', // zk_jazyk
-                '', // zk_ucit_jmeno
-            ];
+                $zkHodnoceni,
+                $zkDatum
+            );
 
             fputcsv($out, $row, ';');
         }
@@ -814,41 +721,6 @@ class StudentsController extends BaseAdminController
     }
     
     /**
-     * Zpracuje odeslání formuláře pro ignorování checker chyb.
-     *
-     * @param string|null $reportPath cesta k checker reportu
-     * @param ScheduledEvent $event vypsaná akce
-     * @param int $assignmentId ID zadání
-     * @param int $id ID studenta
-     * @return void
-     * @author Adam Vaněček
-     */
-    private function handleCheckerIgnoreSubmit(
-        CheckerReportManager $checkerManager,
-        ?string $reportPath,
-        ScheduledEvent $event,
-        int $assignmentId,
-        int $id
-    ): void {
-        if (!$reportPath || !is_file($reportPath)) return;
-        if (!isset($_POST['checker_ignore_form'])) return;
-
-        if ($checkerManager->applyCheckerIgnoresToReport($reportPath, $_POST)) {
-            $this->alertMessage('success', 'Nastavení ignorovaných chyb bylo uloženo.');
-
-            $url = $this->createLink('admin/students', [
-                'event' => $event->id,
-                'action' => 'show',
-                'assignment' => $assignmentId,
-                'id' => $id,
-            ]) . '#auto-check';
-
-            header('Location: ' . $url);
-            exit;
-        }
-    }
-
-    /**
      * Akce pro zobrazení detailu zadání konkrétního studenta, čili všech vygenerovaných i odevzdaných souborů.
      *
      * @param ScheduledEvent $event rozvrhová akce
@@ -891,31 +763,11 @@ class StudentsController extends BaseAdminController
         $this->templateData['files'] = $this->getDatabase()->getStudentAssignmentFiles($assignmentId, $id);
         
         // Author Adam Vaněček
-        $checkerManager = new CheckerReportManager();
-        $files = $this->getDatabase()->getStudentAssignmentFiles($assignmentId, $id);
-        
-        $this->templateData['files'] = $files;
-
-        $checkerReport = null;
-
-        $uploads = array_values(array_filter($files, fn($f) => $f->filetype === FileType::UPLOAD));
-        usort($uploads, fn($a, $b) => $checkerManager->timeToTs($b->time) <=> $checkerManager->timeToTs($a->time));
-        $latestUpload = $uploads[0] ?? null;
-        $latestTime = $latestUpload ? $checkerManager->timeToTs($latestUpload->time) : 0;
-
-        $baseDir = $checkerManager->getBaseDir($id, $assignmentId);
-        $primaryPath = $baseDir . '/primary.json';
+        $reviewManager = new AdminCheckerReviewManager($this->getDatabase());
 
         $setPrimaryId = isset($_GET['setPrimary']) ? (int)$_GET['setPrimary'] : 0;
-        if ($setPrimaryId) {
-            $target = null;
-            foreach ($uploads as $u) {
-                if ((int)$u->id === $setPrimaryId) { $target = $u; break; }
-            }
-
-            if ($target) {
-                $checkerManager->writePrimary($baseDir, $primaryPath, $target, $latestTime, true);
-
+        if ($setPrimaryId > 0) {
+            if ($reviewManager->setPrimaryUpload($assignmentId, $id, $setPrimaryId)) {
                 $url = $this->createLink('admin/students', [
                     'event' => $event->id,
                     'action' => 'show',
@@ -928,24 +780,27 @@ class StudentsController extends BaseAdminController
             }
         }
 
-        $checkerManager->ensurePrimaryIsFresh($baseDir, $primaryPath, $latestUpload, $latestTime);
+        if ($reviewManager->handleIgnoreSubmit($assignmentId, $id, $_POST)) {
+            $this->alertMessage('success', 'Nastavení ignorovaných chyb bylo uloženo.');
 
-        $primaryUpload = $checkerManager->resolvePrimaryUpload($uploads, $primaryPath);
-        $this->templateData['primaryUpload'] = $primaryUpload;
+            $url = $this->createLink('admin/students', [
+                'event' => $event->id,
+                'action' => 'show',
+                'assignment' => $assignmentId,
+                'id' => $id,
+            ]) . '#auto-check';
 
-        $this->templateData['uploadPenalties'] = $checkerManager->buildUploadPenalties($baseDir, $uploads);
-
-        if ($primaryUpload) {
-            $reportPath = $checkerManager->findReportForUpload($baseDir, $primaryUpload->filename, $primaryUpload->time);
-
-            $this->handleCheckerIgnoreSubmit($checkerManager,$reportPath, $event, $assignmentId, $id);
-
-            $checkerReport = $checkerManager->loadCheckerReport($reportPath);
+            header('Location: ' . $url);
+            exit;
         }
 
-        $suggestedComment = $checkerManager->buildSuggestedComment($checkerReport);
-        $this->templateData['suggestedComment'] = $suggestedComment;
-        $this->templateData['checkerReport'] = $checkerReport;
+        $viewData = $reviewManager->buildAssignmentDetailData($assignmentId, $id);
+
+        $this->templateData['files'] = $viewData['files'];
+        $this->templateData['primaryUpload'] = $viewData['primaryUpload'];
+        $this->templateData['uploadPenalties'] = $viewData['uploadPenalties'];
+        $this->templateData['suggestedComment'] = $viewData['suggestedComment'];
+        $this->templateData['checkerReport'] = $viewData['checkerReport'];
         // Author Adam Vaněček
     }
 

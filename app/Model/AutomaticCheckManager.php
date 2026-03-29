@@ -9,6 +9,11 @@ use App\Model\Database\Entities\Assignment;
 use App\Model\Database\Entities\Student;
 use App\Model\Database\Types\FileType;
 
+/**
+ * Třída zajišťuje spuštění automatické kontroly a načtení jejích výstupů.
+ *
+ * @author Adam Vaněček
+ */
 class AutomaticCheckManager
 {
     public function __construct(
