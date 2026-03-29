@@ -31,6 +31,10 @@ enum FileType: int
      * Soubor se studentovým odevzdáním.
      */
     case UPLOAD = 4;
+    /**
+     * Log automatické kontroly.
+     */
+    case CHECKER_LOG = 5;
 
     /**
      * Metoda pro navrácení překladového textu reprezentující daný typ souboru.
@@ -45,6 +49,7 @@ enum FileType: int
             self::INPUT => 'Soubor zadání',
             self::PREVIEW => 'Soubor náhledu',
             self::UPLOAD => 'Odevzdané vypracování',
+            self::CHECKER_LOG => 'Log automatické kontroly',
         };
     }
 }

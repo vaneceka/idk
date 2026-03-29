@@ -461,7 +461,7 @@ class StudentsController extends BaseAdminController
                 $zk_hodnoceni, 
                 '', // zk_body 
                 $zk_datum, // zk_datum 
-                '', // zk_pokus
+                '1', // zk_pokus
                 '', // zk_ucit_idno
                 '', // zk_jazyk
                 '', // zk_ucit_jmeno
@@ -473,7 +473,8 @@ class StudentsController extends BaseAdminController
         fclose($out);
         $this->getDatabase()->log(
             "Byl vygenerován export STAG CSV (akce ID={$event->id}, počet studentů=" . count($students) . ", soubor={$filename}).",
-            LogType::SUBMIT
+            LogType::SUBMIT,
+            userId: $this->loggedUser->id
         );
         exit;
     }
@@ -892,6 +893,7 @@ class StudentsController extends BaseAdminController
         // Author Adam Vaněček
         $checkerManager = new CheckerReportManager();
         $files = $this->getDatabase()->getStudentAssignmentFiles($assignmentId, $id);
+        
         $this->templateData['files'] = $files;
 
         $checkerReport = null;

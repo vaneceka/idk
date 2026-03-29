@@ -13,6 +13,7 @@ use App\Model\Database\Types\Options;
 use App\Model\Session;
 use App\Model\CheckerReportManager;
 use App\Model\ChecksConfigManager;
+use App\Model\AutomaticCheckManager;
 use DateTime;
 
 /**
@@ -77,14 +78,14 @@ class AssignmentsController extends Controller
             $this->templateData['assignment'] = $assignment;
             $this->templateData['details'] = $details;
             $files = $this->getDatabase()->getStudentAssignmentFiles($id, $studentId, true);
-            $allFiles = $this->getDatabase()->getStudentAssignmentFiles($id, $studentId) ?? [];
+            $allFiles = $this->getDatabase()->getStudentAssignmentFiles($id, $studentId);
             foreach ($files as $file) {
                 if ($file->filetype === FileType::ASSIGNMENT_TXT) {
-                    $content = file_get_contents(DOCUMENT_FOLDER . '/' . $file->studentId . '/' . $file->assignmentId . '/' . $file->location);
-                    $this->templateData['assignmentText'] = $content !== false ? $content : '';
+                    $this->templateData['assignmentText'] = file_get_contents(DOCUMENT_FOLDER . '/' . $file->studentId . '/' . $file->assignmentId . '/' . $file->location);
                     break;
                 }
             }
+            // Author Adam Vaněček
             $this->templateData['files'] = $files;
 
             $dbCfg = $this->getDatabase()->getChecksConfigByAssignmentId($assignment->id) ?? [];
@@ -116,6 +117,7 @@ class AssignmentsController extends Controller
             $this->templateData['showValidatorReportSection'] = $showValidatorReportSection;
             $this->templateData['checkerReport'] = $checkerReport;
             $this->templateData['studentViewMinPenalty'] = $studentViewMinPenalty;
+            // Author Adam Vaněček
             $this->templateData['attempts'] = $this->getDatabase()->countStudentAttempts($id, $studentId);
         } else {
             // výchozí akce výpisu všech zadání
@@ -142,7 +144,7 @@ class AssignmentsController extends Controller
             $this->alertMessage('danger', 'Soubor se nepodařilo nahrát!');
             return;
         }
-
+        // Author Adam Vaněček
         try {
             $studentDir = DOCUMENT_FOLDER . '/' . $student->id . '/' . $assignment->id;
 
@@ -157,6 +159,16 @@ class AssignmentsController extends Controller
             }
             $configManager = new ChecksConfigManager();
             $logFile = $studentDir . '/automaticka_kontrola.log';
+
+            $logJustCreated = false;
+
+            if (!is_file($logFile)) {
+                if (@touch($logFile) === false) {
+                    throw new \RuntimeException("Nelze vytvořit log soubor: {$logFile}");
+                }
+
+                $logJustCreated = true;
+            }
             
             $dbCfg = $this->getDatabase()->getChecksConfigByAssignmentId($assignment->id) ?? [];
             $defsText = $configManager->getAllCheckDefinitions('text');
@@ -184,7 +196,23 @@ class AssignmentsController extends Controller
                 throw new \RuntimeException("Nelze zapsat configPath: {$configPath}. " . ($err['message'] ?? ''));
             }
 
-            define('CHECKER_WORKDIR', '/checker');
+            if ($logJustCreated) {
+                $result = $this->getDatabase()->addAssignmentFile(
+                    $assignment->id,
+                    $student->id,
+                    'automaticka_kontrola.log',
+                    FileType::CHECKER_LOG,
+                    'automaticka_kontrola.log'
+                );
+
+                if ($result === false) {
+                    throw new \RuntimeException('Nepodařilo se uložit checker log do databáze.');
+                }
+            }
+
+            if (!defined('CHECKER_WORKDIR')) {
+                define('CHECKER_WORKDIR', '/checker');
+            }
 
             $runner = CHECKER_WORKDIR . '/bin/run_checker.sh';
             $cmd = 'cd ' . escapeshellarg(CHECKER_WORKDIR) . ' && ' .
@@ -195,18 +223,6 @@ class AssignmentsController extends Controller
                 ' --checks-config ' . escapeshellarg($configPath) .
                 ' >> ' . escapeshellarg($logFile) . ' 2>&1 &';
             exec($cmd);
-
-            // $runner = CHECKER_WORKDIR . '/bin/run_checker.sh';
-
-            // $cmd = 'cd ' . escapeshellarg(CHECKER_WORKDIR) . ' && ' .
-            //     escapeshellcmd($runner) .
-            //     ' --student-dir ' . escapeshellarg($studentDir) .
-            //     ' --out-dir ' . escapeshellarg($studentDir) .
-            //     ' --output ' . escapeshellarg('json') .
-            //     ' --checks-config ' . escapeshellarg($configPath) .
-            //     ' >> ' . escapeshellarg($logFile) . ' 2>&1 &';
-
-            // exec($cmd);
 
             $this->getDatabase()->log(
                 "Automatická kontrola byla zařazena do fronty (zadání ID={$assignment->id}).",
@@ -221,8 +237,7 @@ class AssignmentsController extends Controller
                 studentId: $student->id
             );
         }
-       
-        
+        // Author Adam Vaněček
         $this->getDatabase()->log('Student odevzdal soubor ' . $_FILES['attachment']['name'] . ' do zadání ' . $assignment->name, LogType::SUBMIT, studentId: $student->id);
         $this->alertMessage('success', 'Soubor byl úspěšně odevzdán!');
         $this->redirect('assignments', ['id' => $assignment->id]);
