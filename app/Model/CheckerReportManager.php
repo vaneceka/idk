@@ -57,8 +57,8 @@ class CheckerReportManager
 
         $payload = [
             'file_id' => (int) $upload->id,
-            'filename' => (string) $upload->filename,
-            'time' => $this->timeToTs($upload->time),
+            // 'filename' => (string) $upload->filename,
+            // 'time' => $this->timeToTs($upload->time),
             'manual' => $manual,
             'seen_latest_time' => $seenLatestTime,
         ];
