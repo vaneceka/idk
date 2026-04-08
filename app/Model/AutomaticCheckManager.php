@@ -41,7 +41,7 @@ class AutomaticCheckManager
      *
      * @param Assignment $assignment zadání
      * @param Student $student student
-     * @return array{canShowValidatorReport: bool, studentViewMinPenalty: int, checkerReport: mixed, showValidatorReportSection: bool}
+     * @return array{canShowValidatorReport: bool, studentViewMinPenalty: int, checkerReport: mixed, showValidatorReportSection: bool, finalPoints: int}
      */
     public function buildStudentReportData(Assignment $assignment, Student $student, bool $showValidatorReportSection): array
     {
@@ -72,11 +72,21 @@ class AutomaticCheckManager
             $checkerReport = $checkerManager->loadCheckerReport($reportPath);
         }
 
+        $finalPoints = 100;
+        if ($checkerReport && isset($checkerReport['total_penalty'])) {
+            $penalty = (int)$checkerReport['total_penalty'];
+            
+            $finalPoints = max(0, 100 + $penalty);
+
+            $checkerReport['total_penalty'] = max($penalty, -100);
+        }
+
         return [
             'canShowValidatorReport' => $canShowValidatorReport,
             'studentViewMinPenalty' => $studentViewMinPenalty,
             'checkerReport' => $checkerReport,
             'showValidatorReportSection' => $showValidatorReportSection,
+            'finalPoints' => $finalPoints, 
         ];
     }
 
@@ -148,17 +158,27 @@ class AutomaticCheckManager
     private function ensureCheckerLogFile(Assignment $assignment, Student $student, string $studentDir): string
     {
         $logFile = $studentDir . '/automaticka_kontrola.log';
-        $logJustCreated = false;
 
         if (!is_file($logFile)) {
             if (@touch($logFile) === false) {
                 throw new \RuntimeException("Nelze vytvořit log soubor: {$logFile}");
             }
-
-            $logJustCreated = true;
         }
 
-        if ($logJustCreated) {
+        $existingFiles = $this->database->getStudentAssignmentFiles($assignment->id, $student->id);
+
+        $logExistsInDb = false;
+        foreach ($existingFiles as $file) {
+            if (
+                $file->filetype === FileType::CHECKER_LOG &&
+                $file->filename === 'automaticka_kontrola.log'
+            ) {
+                $logExistsInDb = true;
+                break;
+            }
+        }
+
+        if (!$logExistsInDb) {
             $result = $this->database->addAssignmentFile(
                 $assignment->id,
                 $student->id,

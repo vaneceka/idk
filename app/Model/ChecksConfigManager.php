@@ -3,7 +3,12 @@
 declare(strict_types=1);
 
 namespace App\Model;
-
+/**
+ * Třída pro správu konfigurace automatických kontrol zadání a souvisejících nastavení
+ * pro zobrazení výsledků studentovi.
+ *
+ * @author Adam Vaněček
+ */
 class ChecksConfigManager
 {
     

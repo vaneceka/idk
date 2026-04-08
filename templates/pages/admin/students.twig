@@ -23,6 +23,8 @@
             {% include 'components/admin/students/uploadStagExam.twig' %}
         {% elseif action == 'checks-config' %}
             {% include 'components/admin/students/checksConfig.twig' %}
+        {% elseif action == 'review-assignment' %}
+            {% include 'components/admin/students/reviewAssignment.twig' %}
         {% else %}
             {% include 'components/admin/students/default.twig' %}
         {% endif %}

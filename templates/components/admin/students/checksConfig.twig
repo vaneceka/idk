@@ -1,6 +1,6 @@
 <h1>Konfigurace kontrol – {{ assignment.name }}</h1>
 
-<form method="post" action="{{ createLink('admin/students', { action:'checks-config', event:event.id, assignment: assignment.id }) }}" enctype="multipart/form-data">
+<form method="post" action="{{ currentUrl }}" enctype="multipart/form-data">
     <div class="mb-3">
         <label for="file">Nahrát konfiguraci (.json)</label>
         <input id="file" class="form-control" type="file" name="file" required accept=".json,application/json">
@@ -16,7 +16,7 @@
 
 <h2>Ruční výběr kontrol</h2>
 
-<form method="post" action="{{ createLink('admin/students', { action:'checks-config', event:event.id, assignment: assignment.id }) }}">
+<form method="post" action="{{ currentUrl }}">
     <div class="row">
         {% if showTextChecks %}
             <div class="col-md-6">

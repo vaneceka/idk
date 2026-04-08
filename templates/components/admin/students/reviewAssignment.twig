@@ -1,0 +1,76 @@
+<h1>Přehled odevzdání: {{ assignment.name }}</h1>
+<div class="mb-3">
+    <a href="{{ createLink('admin/students', { event: event.id }) }}" class="btn btn-outline-primary">
+        &larr; Zpět na seznam studentů
+    </a>
+</div>
+
+<div class="table-responsive mt-2">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Osobní číslo</th>
+                <th>Orion</th>
+                <th>Jméno</th>
+                <th>Poslední odevzdání</th>
+                <th>Soubor</th>
+                <th class="text-center">Penalizace</th>
+                <th>Stav</th>
+                <th>Akce</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in reviewData %}
+            <tr>
+                <td>{{ row.student.studentNumber }}</td>
+                <td>{{ row.student.orion }}</td>
+                <td>{{ row.student.surname|upper }} {{ row.student.name }}</td>
+                <td>
+                    {% if row.primaryUpload %}
+                        {{ row.primaryUpload.time|date("j. n. Y H:i:s") }}
+                    {% else %}
+                        <span class="text-muted small">Neodevzdáno</span>
+                    {% endif %}
+                </td>
+                <td>{{ row.primaryUpload.filename|default('-') }}</td>
+                <td class="text-center">
+                    {% if row.penalty is not same as(null) %}
+                        <span class="badge {{ row.penalty < 0 ? 'bg-danger' : 'bg-success' }}">{{ row.penalty }}</span>
+                    {% else %}
+                        <span class="text-muted">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="text-{{ row.details.state.getColor() }}">
+                        {{ row.details.state.getText() }}
+                    </span>
+                </td>
+                <td>
+                    <div class="d-flex gap-1">
+                        <a class="btn btn-sm btn-outline-primary" href="{{ createLink('admin/students', { action: 'show', event: event.id, assignment: assignment.id, id: row.student.id }) }}">
+                            Detail
+                        </a>
+                        
+                        {% if row.primaryUpload %}
+                            <a class="btn btn-sm btn-outline-success" 
+                            href="{{ createLink('admin/students', { action: 'review-assignment', event: event.id, assignment: assignment.id, id: row.student.id, quickResult: constant('\\App\\Model\\Database\\Types\\AssignmentState::ACCEPTED').value }) }}">
+                                Přijmout
+                            </a>
+                            
+                            <a class="btn btn-sm btn-outline-danger" 
+                            href="{{ createLink('admin/students', { action: 'review-assignment', event: event.id, assignment: assignment.id, id: row.student.id, quickResult: constant('\\App\\Model\\Database\\Types\\AssignmentState::REJECTED').value }) }}">
+                                Zamítnout
+                            </a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            {% if reviewData is empty %}
+            <tr>
+                <td colspan="8" class="text-center text-muted">K tomuto zadání nejsou přiřazeni žádní studenti.</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>

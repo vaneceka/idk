@@ -66,7 +66,10 @@
             <th>Orion</th>
             <th>Jméno</th>
             {% for assignment in assignments %}
-                <th>{{ assignment.name }}</th>
+                <th> 
+                    <span class="d-inline-block align-middle">{{ assignment.name }}</span>
+                    <a class="btn btn-sm p-0 btn-outline-primary" href="{{ createLink('admin/students', { action: 'review-assignment', event: event.id, assignment: assignment.id }) }}" title="Přehled odevzdání"> Odevzdání </a>
+                </th>
             {% endfor %}
             <th>Akce</th>
         </tr>

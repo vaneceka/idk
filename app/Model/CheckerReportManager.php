@@ -289,10 +289,6 @@ class CheckerReportManager
             }
         }
 
-        if ($total < -100) {
-            $total = -100;
-        }
-
         $data['total_penalty'] = $total;
 
         file_put_contents($reportPath, json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));

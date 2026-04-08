@@ -82,10 +82,14 @@
                                 <hr class="mt-4">
 
                                 <h2>Automatická kontrola</h2>
-
+                                <p class="text-muted small">
+                                    Výsledky této kontroly jsou pouze orientační a slouží jako pomocný ukazatel pro vypracování. Finální hodnocení provádí vyučující.
+                                </p>
                                 {% if checkerReport %}
                                     <div class="mb-3">
-                                        <strong>Penalizace:</strong> {{ checkerReport.total_penalty }}
+                                        <strong>Hodnocení:</strong> 
+                                        {{ max(0, 100 + checkerReport.total_penalty) }} / 100 bodů
+                                        
                                     </div>
 
                                     {% set failedAll = checkerReport.entries |filter(e => e.passed == false and (e.points|abs) >= studentViewMinPenalty) | sort((a, b) => a.points <=> b.points) %}
@@ -96,9 +100,15 @@
                                         <div class="border rounded p-2 bg-light" style="height: 350px; overflow: auto; resize: vertical; min-height: 180px;">
                                             {% for e in failedAll %}
                                                 <div class="bg-white border rounded p-2 mb-2">
-                                                    <div class="fw-semibold">{{ e.code }} — {{ e.name }}</div>
+                                                    <div class="d-flex align-items-center mb-1">
+                                                        <div class="fw-semibold">{{ e.code }} — {{ e.name }}</div>
+                                                        
+                                                        <span class="badge {{ e.points < 0 ? 'bg-danger' : 'bg-success' }} px-2 py-1 ms-2">
+                                                            {{ e.points }}
+                                                        </span>
+                                                    </div>
+
                                                     <div class="text-muted small">{{ e.category }}</div>
-                                                    <div class="small">Body: {{ e.points }}</div>
 
                                                     {% if e.message %}
                                                         <div class="mt-2 small" style="white-space: pre-line; word-break: break-word;">

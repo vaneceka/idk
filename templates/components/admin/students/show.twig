@@ -30,10 +30,7 @@
                                     {% if isPrimary %}
                                       <button type="button" class="btn btn-sm btn-warning" disabled> Hlavní </button>
                                     {% else %}
-                                      <a class="btn btn-sm btn-outline-secondary"
-                                        href="{{ createLink('admin/students', { event: event.id, action: 'show', assignment: assignment.id, id: student.id, setPrimary: file.id }) }}">
-                                        Nastavit jako hlavní
-                                      </a>
+                                      <a class="btn btn-sm btn-outline-secondary" href="{{ createLink('admin/students', { event: event.id, action: 'show', assignment: assignment.id, id: student.id, setPrimary: file.id }) }}"> Nastavit jako hlavní</a>
                                     {% endif %}
                                 </td>
                                 <td class="text-center" style="width:120px;">

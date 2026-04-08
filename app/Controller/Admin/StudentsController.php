@@ -108,6 +108,9 @@ class StudentsController extends BaseAdminController
             case 'checks-config':
                 $this->actionChecksConfig($event);
                 break;
+            case 'review-assignment':
+                $this->actionReviewAssignment($event);
+                break;
             default:
                 $this->error404();
                 return;
@@ -116,6 +119,86 @@ class StudentsController extends BaseAdminController
     }
 
     // AKCE
+    /**
+     * Zobrazí souhrnný přehled odevzdání pro konkrétní zadání.
+     * Umožňuje rychlé přijetí nebo zamítnutí práce přímo ze seznamu
+     * bez nutnosti rozklikávat detail každého studenta.
+     *
+     * @param ScheduledEvent $event vypsaná akce
+     * @return void
+     * @author Adam Vaněček
+     */
+    private function actionReviewAssignment(ScheduledEvent $event): void
+    {
+        if (!isset($_GET['assignment'])) {
+            $this->error404();
+            return;
+        }
+
+        $assignmentId = (int) $_GET['assignment'];
+        $assignment = $this->getDatabase()->getAssignmentById($assignmentId);
+        
+        if (!$assignment || $assignment->scheduledEventId !== $event->id) {
+            $this->error404();
+            return;
+        }
+
+        if (isset($_GET['id'], $_GET['quickResult']) && is_numeric($_GET['quickResult'])) {
+            $studentId = (int)$_GET['id'];
+            $state = AssignmentState::tryFrom((int)$_GET['quickResult']);
+            
+            if ($state !== null) {
+                $details = $this->getDatabase()->getStudentAssignmentDetails($assignmentId, $studentId);
+                $comment = $details ? $details->result : '';
+
+                if ($this->getDatabase()->updateStudentRating($studentId, $assignmentId, $state, $comment)) {
+                    $student = $this->getDatabase()->getStudentById($studentId);
+                    $this->getDatabase()->log('Bylo změněno hodnocení studenta ' . $student->name . ' ' . $student->surname . '(ID ' . $student->id . ') u zadání ' . $assignment->name . ' (' . $assignment->id . ') na ' . $state->getText() . ' (Komentář: ' . $comment . ')', LogType::RATED, userId: $this->loggedUser->id);
+                    $this->alertMessage('success', 'Student ' . $student->surname . ' byl nastaven na: ' . $state->getText());
+                }
+            }
+            
+            $this->redirect('admin/students', [
+                'event' => $event->id,
+                'action' => 'review-assignment',
+                'assignment' => $assignmentId
+            ]);
+            return;
+        }
+
+        $students = array_merge(
+            $this->getDatabase()->getStudentsByScheduledEvent($event->id),
+            $this->getDatabase()->getStudentsAssignedToExam($event->id),
+        );
+
+        $reviewManager = new AdminCheckerReviewManager($this->getDatabase());
+        $reviewData = [];
+
+        foreach ($students as $student) {
+            $details = $this->getDatabase()->getStudentAssignmentDetails($assignmentId, $student->id);
+            if (!$details) continue;
+
+            $assignmentData = $reviewManager->buildAssignmentDetailData($assignmentId, $student->id);
+            $primaryUpload = $assignmentData['primaryUpload'];
+            $penalty = null;
+
+            if ($primaryUpload) {
+                $penalty = $assignmentData['uploadPenalties'][$primaryUpload->id] ?? null;
+            }
+
+            $reviewData[] = [
+                'student' => $student,
+                'details' => $details,
+                'primaryUpload' => $primaryUpload,
+                'penalty' => $penalty
+            ];
+        }
+
+        $this->templateData['assignment'] = $assignment;
+        $this->templateData['reviewData'] = $reviewData;
+    }
+
+
     /**
      * Zobrazí a zpracuje konfiguraci kontrol pro konkrétní zadání.
      * Konfigurace je navázána na konkrétní assignment, nikoliv na celý předmět.
@@ -305,8 +388,6 @@ class StudentsController extends BaseAdminController
         $this->alertMessage('success', 'Konfigurace kontrol byla uložena.');
         $this->redirect('admin/students', [
             'event' => $event->id,
-            'action' => 'checks-config',
-            'assignment' => $assignment->id,
         ]);
     }
 
