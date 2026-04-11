@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace App\Model;
 /**
  * Třída pro správu konfigurace automatických kontrol zadání a souvisejících nastavení
@@ -29,7 +28,12 @@ class ChecksConfigManager
             return [];
         }
 
-        $data = json_decode((string) file_get_contents($registryPath), true);
+        $content = file_get_contents($registryPath);
+        if ($content === false) {
+            return [];
+        }
+
+        $data = json_decode($content, true);
         if (!is_array($data)) {
             return [];
         }
@@ -50,7 +54,6 @@ class ChecksConfigManager
                 'code' => $code,
                 'title' => isset($row['title']) && is_string($row['title']) ? $row['title'] : '',
                 'default_enabled' => array_key_exists('default_enabled', $row) ? (bool)$row['default_enabled'] : true,
-                'order' => array_key_exists('order', $row) ? (int)$row['order'] : 0,
             ];
         }
 

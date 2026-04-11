@@ -20,13 +20,13 @@ class AdminCheckerReviewManager
     }
 
     /**
-     * Připraví data automatické kontroly pro detail zadání studenta.
+     * Připraví společná data pro práci s uploady a checker reporty.
      *
      * @param int $assignmentId ID zadání
      * @param int $studentId ID studenta
      * @return array
      */
-    public function buildAssignmentDetailData(int $assignmentId, int $studentId): array
+    private function prepareUploadContext(int $assignmentId, int $studentId): array
     {
         $checkerManager = new CheckerReportManager();
         $files = $this->database->getStudentAssignmentFiles($assignmentId, $studentId);
@@ -37,6 +37,36 @@ class AdminCheckerReviewManager
 
         $baseDir = $checkerManager->getBaseDir($studentId, $assignmentId);
         $primaryPath = $baseDir . '/primary.json';
+
+        return [
+            'checkerManager' => $checkerManager,
+            'files' => $files,
+            'uploads' => $uploads,
+            'latestUpload' => $latestUpload,
+            'latestTime' => $latestTime,
+            'baseDir' => $baseDir,
+            'primaryPath' => $primaryPath,
+        ];
+    }
+
+    /**
+     * Připraví data automatické kontroly pro detail zadání studenta.
+     *
+     * @param int $assignmentId ID zadání
+     * @param int $studentId ID studenta
+     * @return array
+     */
+    public function buildAssignmentDetailData(int $assignmentId, int $studentId): array
+    {
+        $context = $this->prepareUploadContext($assignmentId, $studentId);
+
+        $checkerManager = $context['checkerManager'];
+        $files = $context['files'];
+        $uploads = $context['uploads'];
+        $latestUpload = $context['latestUpload'];
+        $latestTime = $context['latestTime'];
+        $baseDir = $context['baseDir'];
+        $primaryPath = $context['primaryPath'];
 
         $checkerManager->ensurePrimaryIsFresh($baseDir, $primaryPath, $latestUpload, $latestTime);
 
@@ -82,19 +112,17 @@ class AdminCheckerReviewManager
             return false;
         }
 
-        $checkerManager = new CheckerReportManager();
-        $files = $this->database->getStudentAssignmentFiles($assignmentId, $studentId);
-        $uploads = $this->getSortedUploads($files, $checkerManager);
+        $context = $this->prepareUploadContext($assignmentId, $studentId);
 
-        $latestUpload = $uploads[0] ?? null;
-        $latestTime = $latestUpload ? $checkerManager->timeToTs($latestUpload->time) : 0;
-
-        $baseDir = $checkerManager->getBaseDir($studentId, $assignmentId);
-        $primaryPath = $baseDir . '/primary.json';
+        $checkerManager = $context['checkerManager'];
+        $uploads = $context['uploads'];
+        $latestTime = $context['latestTime'];
+        $baseDir = $context['baseDir'];
+        $primaryPath = $context['primaryPath'];
 
         $target = null;
         foreach ($uploads as $upload) {
-            if ((int)$upload->id === $setPrimaryId) {
+            if ((int) $upload->id === $setPrimaryId) {
                 $target = $upload;
                 break;
             }
@@ -152,10 +180,7 @@ class AdminCheckerReviewManager
      */
     private function getSortedUploads(array $files, CheckerReportManager $checkerManager): array
     {
-        $uploads = array_values(array_filter(
-            $files,
-            fn($file) => $file->filetype === FileType::UPLOAD
-        ));
+        $uploads = array_values(array_filter($files,fn($file) => $file->filetype === FileType::UPLOAD));
 
         usort(
             $uploads,

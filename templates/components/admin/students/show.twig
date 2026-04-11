@@ -102,11 +102,11 @@
   <form method="post"
     action="{{ createLink('admin/students', { event: event.id, action: 'show', assignment: assignment.id, id: student.id }) }}">
     <input type="hidden" name="checker_ignore_form" value="1">
-
+    <input type="hidden" name="checker_ignore_save" value="1">
     <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
       <div class="px-3 py-2 rounded border bg-light text-center" style="min-width:170px;">
         <div class="small text-muted fw-semibold" style="line-height:1;">Penalizace</div>
-        <div class="fs-3 fw-bold" style="line-height:1;">{{ checkerReport.total_penalty }}</div>
+        <div id="total-penalty" class="fs-3 fw-bold" style="line-height:1;">{{ checkerReport.total_penalty }}</div>
       </div>
 
       <div class="ms-auto d-flex align-items-center gap-2">
@@ -115,7 +115,6 @@
           <option value="category">Podle skupiny (kategorie)</option>
         </select>
         
-        <button type="submit" name="checker_ignore_save" value="1" class="btn btn-primary btn-sm">Uložit</button>
       </div>
     </div>
 
@@ -134,12 +133,10 @@
                 <div class="d-flex align-items-center gap-2 flex-wrap" style="line-height:1.2;">
                   <div class="fw-semibold">
                     {{ e.code }} — {{ e.name }}
-                    {% if isIgnored %}
-                      <span class="badge text-bg-secondary ms-2">Ignorováno</span>
-                    {% endif %}
+                    <span class="badge text-bg-secondary ms-2 ignore-badge {{ isIgnored ? '' : 'd-none' }}">Ignorováno</span>
                   </div>
 
-                  <span class="badge {{ isIgnored ? 'bg-secondary' : 'bg-danger' }} px-2 py-1" style="min-width:44px; text-align:center;">{{ e.points }}</span>
+                  <span class="badge {{ isIgnored ? 'bg-secondary' : 'bg-danger' }} px-2 py-1 point-badge" style="min-width:44px; text-align:center;">{{ e.points }}</span>
                 </div>
 
                 <div class="text-muted small" style="line-height:1.2;">
@@ -155,11 +152,11 @@
 
               <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width:170px;">
                 <div class="form-check m-0 d-flex align-items-center gap-1">
-                  <input class="form-check-input m-0"
-                         type="checkbox"
-                         name="ignore[{{ e.code }}]"
-                         value="1"
-                         {% if isIgnored %}checked{% endif %}>
+                  <input class="form-check-input m-0 checker-ignore-cb"
+                    type="checkbox"
+                    name="ignore[{{ e.code }}]"
+                    value="1"
+                    {% if isIgnored %}checked{% endif %}>
                   <label class="form-check-label small m-0">Nezapočítat</label>
                 </div>
               </div>
@@ -168,7 +165,7 @@
         {% endfor %}
       </div>
 
-      {# JavaScript pro řazení chyb přímo v prohlížeči #}
+      {# JavaScript pro řazení chyb #}
       <script>
       function sortCheckerErrors() {
           const container = document.getElementById('checker-errors-container');
@@ -185,13 +182,58 @@
               } else if (sortBy === 'category') {
                   const cA = a.getAttribute('data-category') || '';
                   const cB = b.getAttribute('data-category') || '';
-                  return cA.localeCompare(cB, 'cs'); // 'cs' zajistí správné české řazení (např. Ch, háčky)
+                  return cA.localeCompare(cB, 'cs'); 
               }
               return 0;
           });
 
           items.forEach(item => container.appendChild(item));
       }
+
+      document.addEventListener('DOMContentLoaded', function() {
+          const checkboxes = document.querySelectorAll('.checker-ignore-cb');
+          
+          checkboxes.forEach(cb => {
+              cb.addEventListener('change', async function() {
+                  const itemDiv = this.closest('.checker-error-item');
+                  const form = this.closest('form');
+
+                  if (this.checked) {
+                      itemDiv.classList.add('opacity-50');
+                  } else {
+                      itemDiv.classList.remove('opacity-50');
+                  }
+
+                  let newTotal = 0;
+                  document.querySelectorAll('.checker-error-item').forEach(el => {
+                      const checkbox = el.querySelector('.checker-ignore-cb');
+                      if (checkbox && !checkbox.checked) {
+                          newTotal += parseInt(el.getAttribute('data-points'), 10) || 0;
+                      }
+                  });
+                  
+                  const totalPenaltyEl = document.getElementById('total-penalty');
+                  if (totalPenaltyEl) {
+                      totalPenaltyEl.innerText = newTotal;
+                  }
+
+                  const formData = new FormData(form);
+                  formData.append('checker_ignore_save', '1'); 
+
+                  try {
+                      await fetch(form.action, {
+                          method: 'POST',
+                          body: formData,
+                          headers: {
+                              'X-Requested-With': 'XMLHttpRequest'
+                          }
+                      });
+                  } catch (error) {
+                      console.error('Chyba spojení:', error);
+                  }
+              });
+          });
+      });
       </script>
     {% endif %}
   </form>

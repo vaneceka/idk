@@ -44,7 +44,6 @@ class AssignmentsController extends Controller
 
         $this->templateData['loggedStudent'] = $student;
         $this->templateData['now'] = $now = new DateTime();
-
         // Pokud je v URL dostupné ID, dojde k zobrazení detailu vybraného zadání
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $id = (int) $_GET['id'];
@@ -78,32 +77,24 @@ class AssignmentsController extends Controller
             $this->templateData['assignment'] = $assignment;
             $this->templateData['details'] = $details;
             $files = $this->getDatabase()->getStudentAssignmentFiles($id, $studentId, true);
-            $allFiles = $this->getDatabase()->getStudentAssignmentFiles($id, $studentId);
             foreach ($files as $file) {
                 if ($file->filetype === FileType::ASSIGNMENT_TXT) {
                     $this->templateData['assignmentText'] = file_get_contents(DOCUMENT_FOLDER . '/' . $file->studentId . '/' . $file->assignmentId . '/' . $file->location);
                     break;
                 }
             }
-            $automaticCheckManager = new AutomaticCheckManager($this->getDatabase());
-
-            $this->templateData['assignment'] = $assignment;
-            $this->templateData['details'] = $details;
-
-            $files = $automaticCheckManager->getStudentFiles($id, $studentId);
-            $this->templateData['assignmentText'] = $automaticCheckManager->loadAssignmentText($id, $studentId);
             $this->templateData['files'] = $files;
-
+            $automaticCheckManager = new AutomaticCheckManager($this->getDatabase());
             $reportData = $automaticCheckManager->buildStudentReportData(
                 $assignment,
                 $student,
-                $showValidatorReportSection
             );
 
             $this->templateData['canShowValidatorReport'] = $reportData['canShowValidatorReport'];
-            $this->templateData['showValidatorReportSection'] = $reportData['showValidatorReportSection'];
+            $this->templateData['showValidatorReportSection'] = $showValidatorReportSection;
             $this->templateData['checkerReport'] = $reportData['checkerReport'];
             $this->templateData['studentViewMinPenalty'] = $reportData['studentViewMinPenalty'];
+            $this->templateData['finalPoints'] = $reportData['finalPoints'];
             $this->templateData['attempts'] = $this->getDatabase()->countStudentAttempts($id, $studentId);
         } else {
             // výchozí akce výpisu všech zadání

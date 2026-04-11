@@ -88,14 +88,14 @@
                                 {% if checkerReport %}
                                     <div class="mb-3">
                                         <strong>Hodnocení:</strong> 
-                                        {{ max(0, 100 + checkerReport.total_penalty) }} / 100 bodů
+                                        {{ finalPoints }} / 100 bodů
                                         
                                     </div>
 
                                     {% set failedAll = checkerReport.entries |filter(e => e.passed == false and (e.points|abs) >= studentViewMinPenalty) | sort((a, b) => a.points <=> b.points) %}
 
                                     {% if failedAll|length == 0 %}
-                                        <div class="alert alert-success">Všechny kontroly prošly.</div>
+                                        <div class="alert alert-success">Žádné kontroly k zobrazení.</div>
                                     {% else %}
                                         <div class="border rounded p-2 bg-light" style="height: 350px; overflow: auto; resize: vertical; min-height: 180px;">
                                             {% for e in failedAll %}

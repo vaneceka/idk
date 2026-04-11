@@ -14,10 +14,10 @@ use App\Model\Database\Types\AssignmentState;
 use App\Model\Database\Types\LogType;
 use App\Model\Database\Types\Options;
 use App\Model\Database\Types\FileType;
-use App\Model\CheckerReportManager;
 use App\Model\ChecksConfigManager;
 use App\Model\StagExportManager;
 use App\Model\AdminCheckerReviewManager;
+use App\Model\Database\Types\ProfileType;
 use DateTime;
 
 /**
@@ -153,6 +153,10 @@ class StudentsController extends BaseAdminController
 
                 if ($this->getDatabase()->updateStudentRating($studentId, $assignmentId, $state, $comment)) {
                     $student = $this->getDatabase()->getStudentById($studentId);
+                    if ($student === null) {
+                        $this->error404();
+                        return;
+                    }
                     $this->getDatabase()->log('Bylo změněno hodnocení studenta ' . $student->name . ' ' . $student->surname . '(ID ' . $student->id . ') u zadání ' . $assignment->name . ' (' . $assignment->id . ') na ' . $state->getText() . ' (Komentář: ' . $comment . ')', LogType::RATED, userId: $this->loggedUser->id);
                     $this->alertMessage('success', 'Student ' . $student->surname . ' byl nastaven na: ' . $state->getText());
                 }
@@ -230,8 +234,8 @@ class StudentsController extends BaseAdminController
             return;
         }
 
-        $showTextChecks = $profile->type === \App\Model\Database\Types\ProfileType::DOCUMENT;
-        $showSheetChecks = $profile->type === \App\Model\Database\Types\ProfileType::TABLE_PROCESSOR;
+        $showTextChecks = $profile->type === ProfileType::DOCUMENT;
+        $showSheetChecks = $profile->type === ProfileType::TABLE_PROCESSOR;
 
         $textDefs = $configManager->getAllCheckDefinitions('text');
         $sheetDefs = $configManager->getAllCheckDefinitions('spreadsheet');
@@ -282,7 +286,6 @@ class StudentsController extends BaseAdminController
         $this->templateData['profile'] = $profile;
         $this->templateData['showTextChecks'] = $showTextChecks;
         $this->templateData['showSheetChecks'] = $showSheetChecks;
-        $this->templateData['event'] = $event;
         $this->templateData['studentViewEnabled'] = $studentViewEnabled;
         $this->templateData['studentViewMinPenalty'] = $studentViewMinPenalty;
     }
@@ -386,9 +389,7 @@ class StudentsController extends BaseAdminController
         );
 
         $this->alertMessage('success', 'Konfigurace kontrol byla uložena.');
-        $this->redirect('admin/students', [
-            'event' => $event->id,
-        ]);
+        $this->redirect('admin/students', ['event' => $event->id]);
     }
 
     /**
@@ -862,8 +863,15 @@ class StudentsController extends BaseAdminController
         }
 
         if ($reviewManager->handleIgnoreSubmit($assignmentId, $id, $_POST)) {
-            $this->alertMessage('success', 'Nastavení ignorovaných chyb bylo uloženo.');
+            $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
+            if ($isAjax) {
+                header('Content-Type: application/json');
+                echo json_encode(['status' => 'success']);
+                exit;
+            }
+
+            $this->alertMessage('success', 'Nastavení ignorovaných chyb bylo uloženo.');
             $url = $this->createLink('admin/students', [
                 'event' => $event->id,
                 'action' => 'show',

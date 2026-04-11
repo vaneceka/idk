@@ -41,9 +41,9 @@ class AutomaticCheckManager
      *
      * @param Assignment $assignment zadání
      * @param Student $student student
-     * @return array{canShowValidatorReport: bool, studentViewMinPenalty: int, checkerReport: mixed, showValidatorReportSection: bool, finalPoints: int}
+     * @return array{canShowValidatorReport: bool, studentViewMinPenalty: int, checkerReport: ?array, finalPoints: int}
      */
-    public function buildStudentReportData(Assignment $assignment, Student $student, bool $showValidatorReportSection): array
+    public function buildStudentReportData(Assignment $assignment, Student $student): array
     {
         $dbCfg = $this->database->getChecksConfigByAssignmentId($assignment->id) ?? [];
         $studentViewCfg = is_array($dbCfg['student_view'] ?? null) ? $dbCfg['student_view'] : [];
@@ -85,42 +85,8 @@ class AutomaticCheckManager
             'canShowValidatorReport' => $canShowValidatorReport,
             'studentViewMinPenalty' => $studentViewMinPenalty,
             'checkerReport' => $checkerReport,
-            'showValidatorReportSection' => $showValidatorReportSection,
             'finalPoints' => $finalPoints, 
         ];
-    }
-
-    /**
-     * Vrátí obsah textového zadání pro studenta.
-     *
-     * @param int $assignmentId ID zadání
-     * @param int $studentId ID studenta
-     * @return string
-     */
-    public function loadAssignmentText(int $assignmentId, int $studentId): string
-    {
-        $files = $this->database->getStudentAssignmentFiles($assignmentId, $studentId, true);
-
-        foreach ($files as $file) {
-            if ($file->filetype === FileType::ASSIGNMENT_TXT) {
-                $content = file_get_contents(DOCUMENT_FOLDER . '/' . $file->studentId . '/' . $file->assignmentId . '/' . $file->location);
-                return $content !== false ? $content : '';
-            }
-        }
-
-        return '';
-    }
-
-    /**
-     * Vrátí soubory určené studentovi.
-     *
-     * @param int $assignmentId ID zadání
-     * @param int $studentId ID studenta
-     * @return array
-     */
-    public function getStudentFiles(int $assignmentId, int $studentId): array
-    {
-        return $this->database->getStudentAssignmentFiles($assignmentId, $studentId, true);
     }
 
     /**

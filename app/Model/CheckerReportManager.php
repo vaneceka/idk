@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Model;
-
+use App\Model\Database\Entities\AssignmentFile;
 /**
  * Třída pro práci s reporty automatické kontroly odevzdaných zadání.
  *
@@ -35,7 +35,12 @@ class CheckerReportManager
             return null;
         }
 
-        $data = json_decode((string) file_get_contents($primaryPath), true);
+        $content = file_get_contents($primaryPath);
+        if ($content === false) {
+            return null;
+        }
+
+        $data = json_decode($content, true);
         return is_array($data) ? $data : null;
     }
 
@@ -44,26 +49,31 @@ class CheckerReportManager
      *
      * @param string $baseDir základní adresář pro soubory
      * @param string $primaryPath cesta k souboru s primárním odevzdáním
-     * @param mixed $upload objekt odevzdaného souboru
+     * @param AssignmentFile $upload objekt odevzdaného souboru
      * @param int $seenLatestTime čas posledního známého odevzdání
      * @param bool $manual určuje, zda bylo primární odevzdání nastaveno ručně
      * @return void
      */
-    public function writePrimary(string $baseDir, string $primaryPath, $upload, int $seenLatestTime, bool $manual = false): void
+    public function writePrimary(string $baseDir, string $primaryPath, AssignmentFile $upload, int $seenLatestTime, bool $manual = false): void
     {
-        if (!is_dir($baseDir)) {
-            mkdir($baseDir, 0775, true);
+        if (!is_dir($baseDir) && !mkdir($baseDir, 0775, true) && !is_dir($baseDir)) {
+            throw new \RuntimeException("Nelze vytvořit adresář: {$baseDir}");
         }
 
         $payload = [
             'file_id' => (int) $upload->id,
-            // 'filename' => (string) $upload->filename,
-            // 'time' => $this->timeToTs($upload->time),
             'manual' => $manual,
             'seen_latest_time' => $seenLatestTime,
         ];
 
-        file_put_contents($primaryPath, json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+        $json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        if ($json === false) {
+            throw new \RuntimeException('Nelze serializovat primary payload.');
+        }
+
+        if (file_put_contents($primaryPath, $json) === false) {
+            throw new \RuntimeException("Nelze zapsat soubor: {$primaryPath}");
+        }
     }
 
     /**
@@ -73,7 +83,7 @@ class CheckerReportManager
      * @param string $primaryPath cesta k souboru s primárním odevzdáním
      * @return object|null objekt primárního odevzdání, nebo null pokud žádné neexistuje
      */
-    public function resolvePrimaryUpload(array $uploads, string $primaryPath): ?object
+    public function resolvePrimaryUpload(array $uploads, string $primaryPath): ?AssignmentFile
     {
         if (empty($uploads)) {
             return null;
@@ -150,7 +160,12 @@ class CheckerReportManager
             return null;
         }
 
-        $data = json_decode((string) file_get_contents($reportPath), true);
+        $content = file_get_contents($reportPath);
+        if ($content === false) {
+            return null;
+        }
+
+        $data = json_decode($content, true);
         return is_array($data) ? $data : null;
     }
 
@@ -163,7 +178,7 @@ class CheckerReportManager
      * @param int $latestTime čas nejnovějšího odevzdání
      * @return void
      */
-    public function ensurePrimaryIsFresh(string $baseDir, string $primaryPath, ?object $latestUpload, int $latestTime): void
+    public function ensurePrimaryIsFresh(string $baseDir, string $primaryPath, ?AssignmentFile $latestUpload, int $latestTime): void
     {
         if (!$latestUpload) {
             return;
@@ -236,7 +251,14 @@ class CheckerReportManager
             $reportPath = $this->findReportForUpload($baseDir, $u->filename, $u->time);
 
             if ($reportPath && is_file($reportPath)) {
-                $data = json_decode((string) file_get_contents($reportPath), true);
+                $content = file_get_contents($reportPath);
+                if ($content === false) {
+                    $penalties[$u->id] = null;
+                    continue;
+                }
+
+                $data = json_decode($content, true);
+                $penalties[$u->id] = is_array($data) ? (int) ($data['total_penalty'] ?? 0) : null;
                 $penalties[$u->id] = is_array($data) ? (int) ($data['total_penalty'] ?? 0) : null;
             } else {
                 $penalties[$u->id] = null;
@@ -291,7 +313,11 @@ class CheckerReportManager
 
         $data['total_penalty'] = $total;
 
-        file_put_contents($reportPath, json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-        return true;
+        $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        if ($json === false) {
+            return false;
+        }
+
+        return file_put_contents($reportPath, $json) !== false;
     }
 }
