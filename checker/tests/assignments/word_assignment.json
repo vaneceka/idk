@@ -1,0 +1,209 @@
+{
+    "styles": {
+        "desky-fakulta": {
+            "type": "Times New Roman",
+            "size": 18,
+            "bold": true,
+            "allCaps": true,
+            "alignment": "center"
+        },
+        "desky-nazev-prace": {
+            "type": "Times New Roman",
+            "basedOn": "desky-fakulta",
+            "size": 18,
+            "bold": true,
+            "allCaps": true,
+            "alignment": "center",
+            "spaceBefore": 4000
+        },
+        "desky-rok-a-jmeno": {
+            "type": "Times New Roman",
+            "size": 14,
+            "bold": true,
+            "spaceBefore": 6000,
+            "tabs": [
+                [
+                    "left",
+                    1133
+                ],
+                [
+                    "right",
+                    7936
+                ]
+            ]
+        },
+        "uvodni-tema": {
+            "type": "Times New Roman",
+            "basedOn": "desky-fakulta",
+            "size": 26,
+            "bold": true,
+            "alignment": "center",
+            "spaceBefore": 4000
+        },
+        "uvodni-autor": {
+            "type": "Times New Roman",
+            "alignment": "center",
+            "spaceBefore": 600,
+            "size": 20,
+            "italic": true
+        },
+        "Normal": {
+            "type": "Times New Roman",
+            "size": 12,
+            "alignment": "both",
+            "lineHeight": 1.5
+        },
+        "Heading 1": {
+            "type": "Times New Roman",
+            "size": 16,
+            "bold": true,
+            "allCaps": true,
+            "pageBreakBefore": true,
+            "numLevel": 0,
+            "alignment": "start",
+            "color": "000000"
+        },
+        "Heading 2": {
+            "type": "Times New Roman",
+            "size": 14,
+            "bold": true,
+            "numLevel": 1,
+            "alignment": "start",
+            "color": "000000"
+        },
+        "Heading 3": {
+            "type": "Times New Roman",
+            "size": 12,
+            "bold": true,
+            "numLevel": 2,
+            "alignment": "start",
+            "color": "000000"
+        },
+        "Content Heading": {
+            "type": "Times New Roman",
+            "size": 16,
+            "bold": true,
+            "alignment": "start",
+            "color": "000000"
+        },
+        "Caption": {
+            "italic": true,
+            "alignment": "start",
+            "color": "000000"
+        },
+        "Bibliography": {
+            "alignment": "start"
+        }
+    },
+    "headlines": [
+        {
+            "text": "\u00davod",
+            "level": 1
+        },
+        {
+            "text": "Efektivn\u00ed \u0159\u00edzen\u00ed hospitaliza\u010dn\u00edch proces\u016f a optimalizace l\u016f\u017ekov\u00fdch kapacit",
+            "level": 1
+        },
+        {
+            "text": "Ekonomick\u00e9 a klinick\u00e9 v\u00fdhody pro pacienty",
+            "level": 2
+        },
+        {
+            "text": "Inovativn\u00ed p\u0159\u00edstupy k \u0159\u00edzen\u00ed chronick\u00fdch onemocn\u011bn\u00ed v praxi",
+            "level": 3
+        },
+        {
+            "text": "V\u00fdznam v\u010dasn\u00e9 diagnostiky v prevenci onkologick\u00fdch onemocn\u011bn\u00ed",
+            "level": 3
+        },
+        {
+            "text": "Neurov\u011bdy a l\u00e9\u010dba neurodegenerativn\u00edch onemocn\u011bn\u00ed",
+            "level": 2
+        },
+        {
+            "text": "Metodika klinick\u00fdch studi\u00ed pro hodnocen\u00ed nov\u00fdch l\u00e9\u010div",
+            "level": 1
+        },
+        {
+            "text": "Prevence a l\u00e9\u010dba civiliza\u010dn\u00edch nemoc\u00ed ve st\u00e1rnouc\u00ed populaci",
+            "level": 2
+        },
+        {
+            "text": "Monitorov\u00e1n\u00ed pacient\u016f s vysok\u00fdm rizikem pomoc\u00ed AI",
+            "level": 3
+        },
+        {
+            "text": "Etick\u00e9 aspekty vyu\u017e\u00edv\u00e1n\u00ed pokro\u010dil\u00fdch technologi\u00ed ve zdravotnictv\u00ed",
+            "level": 3
+        },
+        {
+            "text": "Psychosoci\u00e1ln\u00ed podpora jako kl\u00ed\u010dov\u00fd faktor v p\u00e9\u010di o pacienty",
+            "level": 2
+        },
+        {
+            "text": "Pokroky ve v\u00fdzkumu genetick\u00fdch biomarker\u016f",
+            "level": 3
+        },
+        {
+            "text": "Personalizovan\u00e9 p\u0159\u00edstupy k l\u00e9\u010db\u011b neurodegenerativn\u00edch onemocn\u011bn\u00ed",
+            "level": 3
+        },
+        {
+            "text": "Ochrana dat a bezpe\u010dnostn\u00ed protokoly v digit\u00e1ln\u00edm zdravotnictv\u00ed",
+            "level": 3
+        },
+        {
+            "text": "Z\u00e1v\u011br",
+            "level": 1
+        }
+    ],
+    "objects": [
+        {
+            "type": "image",
+            "caption": "V\u00fdzkumn\u00fd t\u00fdm vyhodnocuj\u00edc\u00ed data z klinick\u00e9ho pokusu.",
+            "data": "24_f3ea2_01"
+        },
+        {
+            "type": "image",
+            "caption": "R\u016fzn\u00e9 diagnostick\u00e9 p\u0159\u00edstroje p\u0159ipraven\u00e9 k vy\u0161et\u0159en\u00ed pacienta.",
+            "data": "24_f3ea2_02"
+        }
+    ],
+    "bibliography": [
+        {
+            "type": "book",
+            "data": {
+                "author": "Nov\u00e1k, Petr",
+                "title": "Modern\u00ed metody prevence ve zdravotnictv\u00ed",
+                "year": "2023",
+                "publisher": "Nakladatelstv\u00ed Zdrav\u00ed",
+                "address": "Praha",
+                "isbn": "978-1-234-56789-0"
+            }
+        },
+        {
+            "type": "book",
+            "data": {
+                "author": "\u0160imkov\u00e1, Alena",
+                "title": "Farmakologie v klinick\u00e9 praxi: Teorie a aplikace",
+                "year": "2019",
+                "publisher": "Medika Books",
+                "address": "Ostrava",
+                "isbn": "979-4-5678-1234-7"
+            }
+        },
+        {
+            "type": "article",
+            "data": {
+                "author": "Jel\u00ednek, V\u00e1clav",
+                "title": "Robotick\u00e1 chirurgie a jej\u00ed p\u0159\u00ednos pro pacienty",
+                "journal": "Technologie ve zdravotnictv\u00ed",
+                "year": "2021",
+                "volume": "15",
+                "number": "2",
+                "pages": "10--19",
+                "issn": "4567-1234"
+            }
+        }
+    ]
+}

@@ -22,3 +22,11 @@ const BASE_PATH = "";
  * Konfigurace debuggeru
  */
 const DEBUGGER = false;
+
+/**
+ * Konfigurace validátoru
+ */
+const CHECKER_WORKDIR = ROOT_DIR . '/checker';       
+const CHECKER_RUNNER  = CHECKER_WORKDIR . '/bin/run_checker.sh';
+const CHECKER_REGISTRY = CHECKER_WORKDIR . '/checks/checks_config/checks_registry.json';
+const CHECKER_REPORT_ALL = false;

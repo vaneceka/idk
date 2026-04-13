@@ -1,0 +1,529 @@
+{
+  "_comment": "Tento soubor slouží jako registr kontrol pro zobrazení checkboxů ve webové konfiguraci kontrol.",
+  "text": [
+    {
+      "code": "T_C01",
+      "title": "Oddíly zcela chybí",
+      "default_enabled": true,
+      "order": 1
+    },
+    {
+      "code": "T_C02",
+      "title": "Neexistuje zadaný počet oddílů",
+      "default_enabled": true,
+      "order": 2
+    },
+    {
+      "code": "T_C04",
+      "title": "V prvním oddílu chybí desky práce",
+      "default_enabled": true,
+      "order": 3
+    },
+    {
+      "code": "T_C05",
+      "title": "V prvním oddílu chybí úvodní list nebo zadání",
+      "default_enabled": true,
+      "order": 4
+    },
+    {
+      "code": "T_C06",
+      "title": "V prvním oddílu chybí obsah dokumentu",
+      "default_enabled": true,
+      "order": 5
+    },
+    {
+      "code": "T_C07",
+      "title": "Ve druhém oddílu není celý text dokumentu",
+      "default_enabled": true,
+      "order": 6
+    },
+    {
+      "code": "T_C08",
+      "title": "Ve třetím oddílu není seznam obrázků",
+      "default_enabled": true,
+      "order": 7
+    },
+    {
+      "code": "T_C09",
+      "title": "Ve třetím oddílu není seznam dalších objektů",
+      "default_enabled": true,
+      "order": 8
+    },
+    {
+      "code": "T_C10",
+      "title": "Ve třetím oddílu není seznam literatury",
+      "default_enabled": true,
+      "order": 9
+    },
+    {
+      "code": "T_X04",
+      "title": "Rozsah neodpovídá zadání",
+      "default_enabled": true,
+      "order": 10
+    },
+    {
+      "code": "T_F01",
+      "title": "Text obsahuje původní formátování / nevhodné zalamování",
+      "default_enabled": true,
+      "order": 11
+    },
+    {
+      "code": "T_F02",
+      "title": "Text je formátován přímo, ne styly",
+      "default_enabled": true,
+      "order": 12
+    },
+    {
+      "code": "T_F03",
+      "title": "Styly nejsou důsledně používány",
+      "default_enabled": true,
+      "order": 13
+    },
+    {
+      "code": "T_F04",
+      "title": "Styl Normální není změněn dle zadání",
+      "default_enabled": true,
+      "order": 14
+    },
+    {
+      "code": "T_F05",
+      "title": "Styl Nadpis 1 není změněn dle zadání",
+      "default_enabled": true,
+      "order": 15
+    },
+    {
+      "code": "T_F06",
+      "title": "Styl Nadpis 2 není změněn dle zadání",
+      "default_enabled": true,
+      "order": 16
+    },
+    {
+      "code": "T_F07",
+      "title": "Styl Nadpis 3 není změněn dle zadání",
+      "default_enabled": true,
+      "order": 17
+    },
+    {
+      "code": "T_F08",
+      "title": "Styl Nadpis obsahu není použit",
+      "default_enabled": true,
+      "order": 18
+    },
+    {
+      "code": "T_F09",
+      "title": "Styl Seznam s odrážkami  / Číslovaný seznam  není použit",
+      "default_enabled": true,
+      "order": 19
+    },
+    {
+      "code": "T_F10",
+      "title": "Styl Seznam s odrážkami 2 / Číslovaný seznam 2 není použit",
+      "default_enabled": true,
+      "order": 20
+    },
+    {
+      "code": "T_F11",
+      "title": "Styl Titulek není změněn",
+      "default_enabled": true,
+      "order": 21
+    },
+    {
+      "code": "T_F12",
+      "title": "Styl Bibliografie není změněn",
+      "default_enabled": true,
+      "order": 22
+    },
+    {
+      "code": "T_F14",
+      "title": "Nadpisy nemají aktivováno hierarchické číslování",
+      "default_enabled": true,
+      "order": 23
+    },
+    {
+      "code": "T_F15",
+      "title": "Čísla nadpisů se nezobrazují v obsahu (nebo naopak)",
+      "default_enabled": true,
+      "order": 24
+    },
+    {
+      "code": "T_F16",
+      "title": "Číslovány jsou i kapitoly, které nemají být číslované",
+      "default_enabled": true,
+      "order": 25
+    },
+    {
+      "code": "T_F18",
+      "title": "Chybí / je chybně / není použit požadovaný vlastní styl",
+      "default_enabled": true,
+      "order": 26
+    },
+    {
+      "code": "T_F19",
+      "title": "Chybí vlastní styl využívající dědičnost",
+      "default_enabled": true,
+      "order": 27
+    },
+    {
+      "code": "T_F20",
+      "title": "Chybí vlastní styl s definovanými tabulátory",
+      "default_enabled": true,
+      "order": 28
+    },
+    {
+      "code": "T_F21",
+      "title": "Hlavní kapitola nezačíná na nové straně",
+      "default_enabled": true,
+      "order": 29
+    },
+    {
+      "code": "T_F22",
+      "title": "Horizontální přímé formátování textu (mezery/tečky)",
+      "default_enabled": true,
+      "order": 30
+    },
+    {
+      "code": "T_F23",
+      "title": "Vertikální formátování pomocí prázdných řádků",
+      "default_enabled": true,
+      "order": 31
+    },
+    {
+      "code": "T_F24",
+      "title": "Styly pro desky práce",
+      "default_enabled": true,
+      "order": 32
+    },
+    {
+      "code": "T_F25",
+      "title": "Styly pro úvodní list",
+      "default_enabled": true,
+      "order": 33
+    },
+    {
+      "code": "T_F26",
+      "title": "Nadpisy nejsou použity správně dle seznamu",
+      "default_enabled": true,
+      "order": 34
+    },
+    {
+      "code": "T_O01",
+      "title": "Obsah zcela chybí",
+      "default_enabled": true,
+      "order": 35
+    },
+    {
+      "code": "T_O02",
+      "title": "Obsah není aktuální",
+      "default_enabled": true,
+      "order": 36
+    },
+    {
+      "code": "T_O03",
+      "title": "Dokument je chybně strukturovaný",
+      "default_enabled": true,
+      "order": 37
+    },
+    {
+      "code": "T_O04",
+      "title": "V obsahu chybí nadpisy prvních tří úrovní",
+      "default_enabled": true,
+      "order": 38
+    },
+    {
+      "code": "T_O05",
+      "title": "V obsahu je text z prvního oddílu",
+      "default_enabled": true,
+      "order": 39
+    },
+    {
+      "code": "T_O06",
+      "title": "V obsahu je text nebo objekt, který tam nepatří",
+      "default_enabled": true,
+      "order": 40
+    },
+    {
+      "code": "T_O07",
+      "title": "První kapitola ve druhém oddílu nezačíná na straně 1",
+      "default_enabled": true,
+      "order": 41
+    },
+    {
+      "code": "T_O08",
+      "title": "První kapitola ve třetím oddílu nepokračuje v číslování",
+      "default_enabled": true,
+      "order": 42
+    },
+    {
+      "code": "T_V01",
+      "title": "Seznam obrázků zcela chybí",
+      "default_enabled": true,
+      "order": 43
+    },
+    {
+      "code": "T_V02",
+      "title": "Seznam obrázků není aktuální",
+      "default_enabled": true,
+      "order": 44
+    },
+    {
+      "code": "T_V03",
+      "title": "Není vložen obrázek nebo nemá dostatečné rozlišení",
+      "default_enabled": true,
+      "order": 45
+    },
+    {
+      "code": "T_V05",
+      "title": "Objekt nemá titulek odpovídajícího typu / je vytvořen ručně",
+      "default_enabled": true,
+      "order": 46
+    },
+    {
+      "code": "T_V06",
+      "title": "V titulku chybí stručný popis objektu",
+      "default_enabled": true,
+      "order": 47
+    },
+    {
+      "code": "T_V07",
+      "title": "V textu není křížový odkaz na objekt",
+      "default_enabled": true,
+      "order": 48
+    },
+    {
+      "code": "T_V08",
+      "title": "Objekt není spojen/skupen s titulkem",
+      "default_enabled": true,
+      "order": 49
+    },
+    {
+      "code": "T_L01",
+      "title": "Seznam literatury chybí",
+      "default_enabled": true,
+      "order": 50
+    },
+    {
+      "code": "T_L02",
+      "title": "Seznam literatury není aktuální",
+      "default_enabled": true,
+      "order": 51
+    },
+    {
+      "code": "T_L04",
+      "title": "Pramen není citován v textu",
+      "default_enabled": true,
+      "order": 52
+    },
+    {
+      "code": "T_L05",
+      "title": "Pramen je citován na nevhodném místě",
+      "default_enabled": true,
+      "order": 53
+    },
+    {
+      "code": "T_L07",
+      "title": "Online pramen nemá správně vyplněné URL",
+      "default_enabled": true,
+      "order": 54
+    },
+    {
+      "code": "T_L08",
+      "title": "Použitý pramen nemá vyplněna bibliografická pole",
+      "default_enabled": true,
+      "order": 55
+    },
+    {
+      "code": "T_Z01",
+      "title": "Záhlaví v dokumentu není řešeno",
+      "default_enabled": true,
+      "order": 56
+    },
+    {
+      "code": "T_Z02",
+      "title": "První oddíl nemá prázdné záhlaví",
+      "default_enabled": true,
+      "order": 57
+    },
+    {
+      "code": "T_Z03",
+      "title": "První oddíl nemá prázdné zápatí",
+      "default_enabled": true,
+      "order": 58
+    },
+    {
+      "code": "T_Z04",
+      "title": "Druhý oddíl je propojen s předchozím v záhlaví",
+      "default_enabled": true,
+      "order": 59
+    },
+    {
+      "code": "T_Z05",
+      "title": "Druhý oddíl je propojen s předchozím v zápatí",
+      "default_enabled": true,
+      "order": 60
+    },
+    {
+      "code": "T_Z06",
+      "title": "Druhý oddíl nemá požadovaný text v záhlaví",
+      "default_enabled": true,
+      "order": 61
+    },
+    {
+      "code": "T_Z07",
+      "title": "Druhý oddíl nemá číslo strany v zápatí",
+      "default_enabled": true,
+      "order": 62
+    },
+    {
+      "code": "T_Z08",
+      "title": "Druhý oddíl nemá číslování stran od 1",
+      "default_enabled": true,
+      "order": 63
+    },
+    {
+      "code": "T_Z09",
+      "title": "Třetí oddíl je propojen s předchozím v záhlaví",
+      "default_enabled": true,
+      "order": 64
+    },
+    {
+      "code": "T_Z10",
+      "title": "Třetí oddíl je propojen s předchozím v zápatí",
+      "default_enabled": true,
+      "order": 65
+    },
+    {
+      "code": "T_Z11",
+      "title": "Třetí oddíl nemá prázdné záhlaví",
+      "default_enabled": true,
+      "order": 66
+    },
+    {
+      "code": "T_Z12",
+      "title": "Třetí oddíl nemá číslo strany v zápatí",
+      "default_enabled": true,
+      "order": 67
+    }
+  ],
+  "spreadsheet": [
+    {
+      "code": "S_D01",
+      "title": "Chybí list \"zdroj\"",
+      "default_enabled": true,
+      "order": 1
+    },
+    {
+      "code": "S_D03",
+      "title": "Chybí list \"data\"",
+      "default_enabled": true,
+      "order": 2
+    },
+    {
+      "code": "S_D04",
+      "title": "Vzorce nelze kopírovat",
+      "default_enabled": true,
+      "order": 3
+    },
+    {
+      "code": "S_D05",
+      "title": "Chybí výpočet / chybný výpočet",
+      "default_enabled": true,
+      "order": 4
+    },
+    {
+      "code": "S_D06",
+      "title": "Použit maticový vzorec",
+      "default_enabled": true,
+      "order": 5
+    },
+    {
+      "code": "S_D07",
+      "title": "Použity pojmenované oblasti místo adres",
+      "default_enabled": true,
+      "order": 6
+    },
+    {
+      "code": "S_D08",
+      "title": "Nadbytečné absolutní adresy",
+      "default_enabled": true,
+      "order": 7
+    },
+    {
+      "code": "S_D09",
+      "title": "Chybí popisná charakteristika",
+      "default_enabled": true,
+      "order": 8
+    },
+    {
+      "code": "S_D11",
+      "title": "Chybí popisná charakteristika datové řady",
+      "default_enabled": true,
+      "order": 9
+    },
+    {
+      "code": "S_F01",
+      "title": "Chybné formátování číselných hodnot",
+      "default_enabled": true,
+      "order": 10
+    },
+    {
+      "code": "S_F03",
+      "title": "Chybí ohraničení tabulky",
+      "default_enabled": true,
+      "order": 11
+    },
+    {
+      "code": "S_F04",
+      "title": "Chybné sloučení buněk",
+      "default_enabled": true,
+      "order": 12
+    },
+    {
+      "code": "S_F05",
+      "title": "Neformátované záhlaví tabulky",
+      "default_enabled": true,
+      "order": 13
+    },
+    {
+      "code": "S_F06",
+      "title": "Není zalamování textu v buňce",
+      "default_enabled": true,
+      "order": 14
+    },
+    {
+      "code": "S_F07",
+      "title": "Chybí podmíněné formátování",
+      "default_enabled": true,
+      "order": 15
+    },
+    {
+      "code": "S_F08",
+      "title": "Podmíněné formátování nefunguje správně",
+      "default_enabled": true,
+      "order": 16
+    },
+    {
+      "code": "S_G01",
+      "title": "Chybí požadovaný graf",
+      "default_enabled": true,
+      "order": 17
+    },
+    {
+      "code": "S_G02",
+      "title": "Použit 3D graf",
+      "default_enabled": true,
+      "order": 18
+    },
+    {
+      "code": "S_G03",
+      "title": "V grafu chybí popisky",
+      "default_enabled": true,
+      "order": 19
+    },
+    {
+      "code": "S_G04",
+      "title": "Nevhodný typ grafu",
+      "default_enabled": true,
+      "order": 20
+    }
+  ]
+}

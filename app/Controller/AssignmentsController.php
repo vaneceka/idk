@@ -11,8 +11,6 @@ use App\Model\Database\Types\FileType;
 use App\Model\Database\Types\LogType;
 use App\Model\Database\Types\Options;
 use App\Model\Session;
-use App\Model\CheckerReportManager;
-use App\Model\ChecksConfigManager;
 use App\Model\AutomaticCheckManager;
 use DateTime;
 

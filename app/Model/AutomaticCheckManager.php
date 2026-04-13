@@ -215,14 +215,20 @@ class AutomaticCheckManager
             define('CHECKER_WORKDIR', '/checker');
         }
 
-        $runner = CHECKER_WORKDIR . '/bin/run_checker.sh';
-        $cmd = 'cd ' . escapeshellarg(CHECKER_WORKDIR) . ' && ' .
+        $runner = defined('CHECKER_RUNNER') ? CHECKER_RUNNER : CHECKER_WORKDIR . '/bin/run_checker.sh';
+
+        $pythonCmd = 'cd ' . escapeshellarg(CHECKER_WORKDIR) . ' && ' .
             escapeshellcmd($runner) .
             ' --student-dir ' . escapeshellarg($studentDir) .
             ' --out-dir ' . escapeshellarg($studentDir) .
             ' --output ' . escapeshellarg('json') .
-            ' --checks-config ' . escapeshellarg($configPath) .
-            ' >> ' . escapeshellarg($logFile) . ' 2>&1 &';
+            ' --checks-config ' . escapeshellarg($configPath);
+
+        if (defined('CHECKER_REPORT_ALL') && CHECKER_REPORT_ALL === true) {
+            $pythonCmd .= ' --report-all';
+        }
+
+        $cmd = '(' . $pythonCmd . ' ; rm -f ' . escapeshellarg($configPath) . ') >> ' . escapeshellarg($logFile) . ' 2>&1 &';
 
         exec($cmd);
     }

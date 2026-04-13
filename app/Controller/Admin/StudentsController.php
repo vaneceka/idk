@@ -14,10 +14,10 @@ use App\Model\Database\Types\AssignmentState;
 use App\Model\Database\Types\LogType;
 use App\Model\Database\Types\Options;
 use App\Model\Database\Types\FileType;
+use App\Model\Database\Types\ProfileType;
 use App\Model\ChecksConfigManager;
 use App\Model\StagExportManager;
 use App\Model\AdminCheckerReviewManager;
-use App\Model\Database\Types\ProfileType;
 use DateTime;
 
 /**

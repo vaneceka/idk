@@ -21,9 +21,8 @@ class ChecksConfigManager
     public function getAllCheckDefinitions(string $type): array
     {   
         
-        // $registryPath = CHECKER_REGISTRY;
-        $registryPath = '/checker/checks/checks_config/checks_registry.json';
-
+        $registryPath = CHECKER_REGISTRY;
+        
         if (!is_file($registryPath)) {
             return [];
         }

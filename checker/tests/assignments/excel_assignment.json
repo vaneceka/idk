@@ -1,0 +1,1636 @@
+{
+    "cells": {
+        "A1": {
+            "style": {
+                "bold": true,
+                "alignment": true,
+                "numberFormat": null
+            },
+            "input": "Pacient"
+        },
+        "B1": {
+            "style": {
+                "bold": true,
+                "alignment": true,
+                "numberFormat": null
+            },
+            "input": "Pohlav\u00ed"
+        },
+        "C1": {
+            "style": {
+                "bold": true,
+                "alignment": true,
+                "numberFormat": null
+            },
+            "input": "V\u00fd\u0161ka (cm)"
+        },
+        "D1": {
+            "style": {
+                "bold": true,
+                "alignment": true,
+                "numberFormat": null
+            },
+            "input": "V\u00e1ha (kg)"
+        },
+        "E1": {
+            "style": {
+                "bold": true,
+                "alignment": true,
+                "numberFormat": null
+            },
+            "input": "BMI"
+        },
+        "F1": {
+            "style": {
+                "bold": true,
+                "alignment": true,
+                "numberFormat": null
+            },
+            "input": "BMI nad st\u0159edn\u00ed hodnotou"
+        },
+        "A2": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 1
+        },
+        "B2": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "\u017eena"
+        },
+        "C2": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 170.7
+        },
+        "D2": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 64.6
+        },
+        "E2": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D2\/(C2\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F2": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E2,\"ne\",\"v\u00edce\")"
+        },
+        "A3": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 2
+        },
+        "B3": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "\u017eena"
+        },
+        "C3": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 159.8
+        },
+        "D3": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 103.7
+        },
+        "E3": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D3\/(C3\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F3": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E3,\"ne\",\"v\u00edce\")"
+        },
+        "A4": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 3
+        },
+        "B4": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "\u017eena"
+        },
+        "C4": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 183.5
+        },
+        "D4": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 68
+        },
+        "E4": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D4\/(C4\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F4": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E4,\"ne\",\"v\u00edce\")"
+        },
+        "A5": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 4
+        },
+        "B5": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "mu\u017e"
+        },
+        "C5": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 158.2
+        },
+        "D5": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 91.4
+        },
+        "E5": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D5\/(C5\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F5": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E5,\"ne\",\"v\u00edce\")"
+        },
+        "A6": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 5
+        },
+        "B6": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "mu\u017e"
+        },
+        "C6": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 170.3
+        },
+        "D6": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 55.1
+        },
+        "E6": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D6\/(C6\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F6": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E6,\"ne\",\"v\u00edce\")"
+        },
+        "A7": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 6
+        },
+        "B7": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "mu\u017e"
+        },
+        "C7": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 182.4
+        },
+        "D7": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 84.3
+        },
+        "E7": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D7\/(C7\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F7": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E7,\"ne\",\"v\u00edce\")"
+        },
+        "A8": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 7
+        },
+        "B8": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "\u017eena"
+        },
+        "C8": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 177.8
+        },
+        "D8": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 76
+        },
+        "E8": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D8\/(C8\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F8": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E8,\"ne\",\"v\u00edce\")"
+        },
+        "A9": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 8
+        },
+        "B9": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "mu\u017e"
+        },
+        "C9": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 189.6
+        },
+        "D9": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 97.5
+        },
+        "E9": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D9\/(C9\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F9": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E9,\"ne\",\"v\u00edce\")"
+        },
+        "A10": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 9
+        },
+        "B10": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "\u017eena"
+        },
+        "C10": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 166.5
+        },
+        "D10": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 99.7
+        },
+        "E10": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D10\/(C10\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F10": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E10,\"ne\",\"v\u00edce\")"
+        },
+        "A11": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 10
+        },
+        "B11": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "\u017eena"
+        },
+        "C11": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 160.6
+        },
+        "D11": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 56.1
+        },
+        "E11": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D11\/(C11\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F11": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E11,\"ne\",\"v\u00edce\")"
+        },
+        "A12": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 11
+        },
+        "B12": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "\u017eena"
+        },
+        "C12": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 176.5
+        },
+        "D12": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 121.3
+        },
+        "E12": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D12\/(C12\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F12": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E12,\"ne\",\"v\u00edce\")"
+        },
+        "A13": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 12
+        },
+        "B13": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "\u017eena"
+        },
+        "C13": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 173.8
+        },
+        "D13": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 75.7
+        },
+        "E13": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D13\/(C13\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F13": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E13,\"ne\",\"v\u00edce\")"
+        },
+        "A14": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 13
+        },
+        "B14": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "\u017eena"
+        },
+        "C14": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 186.7
+        },
+        "D14": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 114.6
+        },
+        "E14": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D14\/(C14\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F14": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E14,\"ne\",\"v\u00edce\")"
+        },
+        "A15": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 14
+        },
+        "B15": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "\u017eena"
+        },
+        "C15": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 167.6
+        },
+        "D15": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 110.1
+        },
+        "E15": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D15\/(C15\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F15": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E15,\"ne\",\"v\u00edce\")"
+        },
+        "A16": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 15
+        },
+        "B16": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "mu\u017e"
+        },
+        "C16": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 162.6
+        },
+        "D16": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 101.9
+        },
+        "E16": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D16\/(C16\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F16": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E16,\"ne\",\"v\u00edce\")"
+        },
+        "A17": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 16
+        },
+        "B17": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "mu\u017e"
+        },
+        "C17": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 172.8
+        },
+        "D17": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 121
+        },
+        "E17": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D17\/(C17\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F17": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E17,\"ne\",\"v\u00edce\")"
+        },
+        "A18": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 17
+        },
+        "B18": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "mu\u017e"
+        },
+        "C18": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 161.4
+        },
+        "D18": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 76.6
+        },
+        "E18": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D18\/(C18\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F18": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E18,\"ne\",\"v\u00edce\")"
+        },
+        "A19": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 18
+        },
+        "B19": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "mu\u017e"
+        },
+        "C19": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 182.7
+        },
+        "D19": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 104.5
+        },
+        "E19": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D19\/(C19\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F19": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E19,\"ne\",\"v\u00edce\")"
+        },
+        "A20": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 19
+        },
+        "B20": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "\u017eena"
+        },
+        "C20": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 164.8
+        },
+        "D20": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 122.4
+        },
+        "E20": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D20\/(C20\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F20": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E20,\"ne\",\"v\u00edce\")"
+        },
+        "A21": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 20
+        },
+        "B21": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "mu\u017e"
+        },
+        "C21": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 173.3
+        },
+        "D21": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 74.7
+        },
+        "E21": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D21\/(C21\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F21": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E21,\"ne\",\"v\u00edce\")"
+        },
+        "A22": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 21
+        },
+        "B22": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "mu\u017e"
+        },
+        "C22": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 158.1
+        },
+        "D22": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 76.9
+        },
+        "E22": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D22\/(C22\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F22": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E22,\"ne\",\"v\u00edce\")"
+        },
+        "A23": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": 22
+        },
+        "B23": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "\u017eena"
+        },
+        "C23": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 174.5
+        },
+        "D23": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "input": 126.9
+        },
+        "E23": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.0"
+            },
+            "expression": "=D23\/(C23\/100)^2",
+            "conditionalFormat": [
+                {
+                    "type": "cellIs",
+                    "operator": "lessThan",
+                    "value": 18.5,
+                    "fillColor": "5981C2",
+                    "textColor": null
+                },
+                {
+                    "type": "cellIs",
+                    "operator": "greaterThan",
+                    "value": 25,
+                    "fillColor": null,
+                    "textColor": "FF0000"
+                }
+            ]
+        },
+        "F23": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "expression": "=IF(E$30>E23,\"ne\",\"v\u00edce\")"
+        },
+        "B27": {
+            "style": {
+                "bold": true,
+                "alignment": true,
+                "numberFormat": null
+            },
+            "input": "Minimum"
+        },
+        "C27": {
+            "style": {
+                "bold": true,
+                "alignment": true,
+                "numberFormat": null
+            },
+            "input": "Maximum"
+        },
+        "D27": {
+            "style": {
+                "bold": true,
+                "alignment": true,
+                "numberFormat": null
+            },
+            "input": "Pr\u016fm\u011br"
+        },
+        "E27": {
+            "style": {
+                "bold": true,
+                "alignment": true,
+                "numberFormat": null
+            },
+            "input": "St\u0159edn\u00ed hodnota"
+        },
+        "A28": {
+            "style": {
+                "bold": true,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "V\u00fd\u0161ka"
+        },
+        "A29": {
+            "style": {
+                "bold": true,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "V\u00e1ha"
+        },
+        "A30": {
+            "style": {
+                "bold": true,
+                "alignment": false,
+                "numberFormat": null
+            },
+            "input": "BMI"
+        },
+        "B28": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.00"
+            },
+            "expression": "=MIN(C2:C23)"
+        },
+        "C28": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.00"
+            },
+            "expression": "=MAX(C2:C23)"
+        },
+        "D28": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.00"
+            },
+            "expression": "=AVERAGE(C2:C23)"
+        },
+        "E28": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.00"
+            },
+            "expression": "=MEDIAN(C2:C23)"
+        },
+        "B29": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.00"
+            },
+            "expression": "=MIN(D2:D23)"
+        },
+        "C29": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.00"
+            },
+            "expression": "=MAX(D2:D23)"
+        },
+        "D29": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.00"
+            },
+            "expression": "=AVERAGE(D2:D23)"
+        },
+        "E29": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.00"
+            },
+            "expression": "=MEDIAN(D2:D23)"
+        },
+        "B30": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.00"
+            },
+            "expression": "=MIN(E2:E23)"
+        },
+        "C30": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.00"
+            },
+            "expression": "=MAX(E2:E23)"
+        },
+        "D30": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.00"
+            },
+            "expression": "=AVERAGE(E2:E23)"
+        },
+        "E30": {
+            "style": {
+                "bold": false,
+                "alignment": false,
+                "numberFormat": "#,##0.00"
+            },
+            "expression": "=MEDIAN(E2:E23)"
+        }
+    },
+    "borders": [
+        {
+            "location": "A1:F23",
+            "outlineBorderStyle": "thick",
+            "insideBorderStyle": "thin"
+        },
+        {
+            "location": "A27:E30",
+            "outlineBorderStyle": "thick",
+            "insideBorderStyle": "thin"
+        }
+    ],
+    "chart": {
+        "type": "barChart",
+        "title": "V\u00e1ha pacient\u016f",
+        "categories": {
+            "data!$A$2:$A$23": "data!$A$1"
+        },
+        "values": {
+            "data!$D$2:$D$23": "data!$D$1"
+        },
+        "xAxisLabel": "Pacient",
+        "yAxisLabel": "V\u00e1ha"
+    }
+}
